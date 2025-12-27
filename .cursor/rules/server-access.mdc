@@ -1,0 +1,219 @@
+---
+description: Server access and file upload procedures for joeyspace.dev VPS — SSH via `joeyspace`, SCP for file transfers, and common server operations
+alwaysApply: false
+---
+
+# Server Access and File Upload Rules
+
+## Rule Intent
+
+Provide clear procedures for accessing the VPS server and uploading files using SSH and SCP. All server access uses the `joeyspace` SSH config alias. This rule supplements the main server operations rule with specific file transfer and access patterns.
+
+## When to Apply
+
+Apply this rule when:
+- Uploading files or directories to the server
+- Downloading files from the server
+- Accessing the server for file management
+- Setting up static file serving directories
+- Troubleshooting file permission or upload issues
+
+## SSH Configuration
+
+The server is accessed via the `joeyspace` SSH config entry in `~/.ssh/config`:
+
+```
+Host joeyspace
+    HostName <server-ip-or-domain>
+    User <username>
+    IdentityFile ~/.ssh/<private-key>
+    Port 22
+```
+
+**Always use `joeyspace` as the SSH host alias** - never hardcode IPs or user@host formats.
+
+## Accessing the Server
+
+### Interactive SSH Session
+
+```bash
+ssh joeyspace
+```
+
+Opens an interactive shell on the remote server.
+
+### Remote Command Execution
+
+Execute commands without opening an interactive session:
+
+```bash
+ssh joeyspace "command here"
+```
+
+**Common remote commands:**
+- `ssh joeyspace "uptime"` - Check server status
+- `ssh joeyspace "ls -la /var/www/dev.joeyspace.dev/"` - List files
+- `ssh joeyspace "sudo systemctl status nginx"` - Check service status
+- `ssh joeyspace "tail -f /var/log/nginx/error.log"` - View logs
+
+## File Upload Procedures
+
+### Using SCP (Secure Copy)
+
+**Upload a single file:**
+```bash
+scp /path/to/local/file joeyspace:/path/to/remote/destination/
+```
+
+**Upload a directory (recursive):**
+```bash
+scp -r /path/to/local/directory joeyspace:/path/to/remote/destination/
+```
+
+**Upload with preserved permissions:**
+```bash
+scp -rp /path/to/local/file joeyspace:/path/to/remote/destination/
+```
+
+### Standard Upload Workflow
+**DO NOT use manual scp commands for full deployments.** 1. **Verify Local Build**: Ensure all changes are tested and saved.
+2. **Execute Deployment Script**: 
+   ```bash
+   ./sync-to-server.sh
+
+### Common Upload Patterns
+
+**Upload static files for web serving:**
+```bash
+# Create directory with proper ownership
+ssh joeyspace "sudo mkdir -p /var/www/detection && sudo chown $USER:$USER /var/www/detection"
+
+# Upload folder
+scp -r detection/ joeyspace:/var/www/
+```
+
+**Upload application build files:**
+```bash
+# Clean old files first
+ssh joeyspace "rm -rf /var/www/dev.joeyspace.dev/*"
+
+# Upload new build
+scp -r dist/* joeyspace:/var/www/dev.joeyspace.dev/
+```
+
+**Upload and execute a script:**
+```bash
+# Upload script
+scp deploy-script.sh joeyspace:/tmp/
+
+# Make executable and run
+ssh joeyspace "chmod +x /tmp/deploy-script.sh && /tmp/deploy-script.sh"
+```
+
+## File Download Procedures
+
+**Download a single file:**
+```bash
+scp joeyspace:/path/to/remote/file /path/to/local/destination/
+```
+
+**Download a directory:**
+```bash
+scp -r joeyspace:/path/to/remote/directory /path/to/local/destination/
+```
+
+**Common download scenarios:**
+- Backup nginx config: `scp joeyspace:/etc/nginx/sites-available/dev.joeyspace.dev ./nginx-config-backup`
+- Download logs: `scp joeyspace:/var/log/nginx/error.log ./error-log-backup.log`
+
+## Key Server Directories
+
+**Web Directories:**
+- Production: `/var/www/joeyspace.dev/`
+- Development: `/var/www/dev.joeyspace.dev/`
+- Server Application: `/var/www/joeyspace.dev/server/`
+
+**Configuration:**
+- Nginx Configs: `/etc/nginx/sites-available/`
+- SSL Certificates: `/etc/letsencrypt/live/`
+
+**Logs:**
+- Nginx Logs: `/var/log/nginx/`
+- PM2 Logs: `~/.pm2/logs/`
+
+## Permission Handling
+
+**If you get permission denied errors:**
+
+```bash
+# Option 1: Change ownership
+ssh joeyspace "sudo chown -R $USER:$USER /var/www/detection"
+
+# Option 2: Upload to user directory, then move with sudo
+scp -r detection/ joeyspace:~/detection/
+ssh joeyspace "sudo mv ~/detection /var/www/ && sudo chown -R www-data:www-data /var/www/detection"
+```
+
+**Set web server permissions:**
+```bash
+ssh joeyspace "sudo chmod -R 755 /var/www/detection"
+```
+
+## Troubleshooting
+
+**Connection timeout:**
+1. Check server is running: `ping <server-ip>`
+2. Verify SSH service: `ssh joeyspace "sudo systemctl status ssh"`
+3. Check firewall: `ssh joeyspace "sudo ufw status"`
+
+**File not found after upload:**
+1. Verify upload: `ssh joeyspace "ls -la /path/to/destination/"`
+2. Check permissions: `ssh joeyspace "ls -l /path/to/destination/"`
+3. Ensure web server can read: `ssh joeyspace "sudo chmod -R 755 /var/www/detection"`
+
+## Best Practices
+
+1. **Test locally first** - Develop and test changes locally before uploading
+2. **Backup before changes** - Download existing files before overwriting
+3. **Use scripts for deployment** - Create deployment scripts for repeatable processes
+4. **Verify after upload** - Check files uploaded correctly and services are working
+5. **Use version control** - Commit changes to git before deploying
+
+## Command Templates
+
+**Complete upload workflow:**
+```bash
+# Create directory
+ssh joeyspace "sudo mkdir -p /var/www/detection && sudo chown $USER:$USER /var/www/detection"
+
+# Upload
+scp -r detection/ joeyspace:/var/www/
+
+# Verify
+ssh joeyspace "ls -la /var/www/detection/"
+
+# Set permissions
+ssh joeyspace "sudo chmod -R 755 /var/www/detection"
+```
+
+**Upload and execute script:**
+```bash
+scp script.sh joeyspace:/tmp/script.sh && \
+ssh joeyspace "chmod +x /tmp/script.sh && /tmp/script.sh"
+```
+
+**Backup before upload:**
+```bash
+# Download existing files as backup
+scp -r joeyspace:/var/www/detection ./detection-backup-$(date +%Y%m%d)/
+
+# Then upload new files
+scp -r detection/ joeyspace:/var/www/
+```
+
+## Success Criteria
+
+- Files uploaded successfully verified with `ls -la` on server
+- Proper permissions set for web server access
+- Services can access uploaded files
+- No permission denied errors in logs

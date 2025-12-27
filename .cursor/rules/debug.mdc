@@ -1,0 +1,168 @@
+---
+description: Debugging and troubleshooting practices for bug fixes and investigations
+alwaysApply: false
+---
+
+# Debug Rules
+
+## When to Apply This Rule
+Use when:
+- Debugging existing code
+- Investigating bugs or errors
+- Fixing reported issues
+- Code is not behaving as expected
+
+## Debugging Process
+
+### STEP 1: Understand Expected Behavior
+1. Check `README.md` for feature specifications
+2. Review related documentation
+3. Search conversation history for context
+4. Identify what SHOULD happen vs what IS happening
+
+### STEP 2: Reproduce the Issue
+1. Identify exact steps that trigger the bug
+2. Check browser console for errors (frontend)
+3. Check backend logs (`logs/` directory)
+4. Check PowerShell script output/errors (if testing)
+5. Verify in both dev and production environments
+6. Test across devices (desktop, mobile)
+
+### STEP 3: Isolate the Problem
+**Frontend Issues:**
+- Check browser DevTools Console tab for JS errors
+- Check Network tab for failed API calls
+- Verify HTML structure in Elements tab
+- Test with different browsers
+
+**Backend Issues:**
+- Check server logs for errors
+- Test API endpoints with curl/Postman
+- Verify database queries in Supabase dashboard
+- Check environment variables are set
+
+**Database Issues:**
+- Run queries directly in Supabase SQL editor
+- Check table structure matches schema
+- Verify RLS policies are correct
+- Check for foreign key violations
+
+### STEP 4: Minimal Fixes Only
+- Fix the specific issue ONLY
+- Do NOT refactor unrelated code
+- Do NOT rename or move files unless required for fix
+- Keep changes focused and testable
+
+### STEP 5: Verify the Fix
+Test that:
+- [ ] Original bug is resolved
+- [ ] No new bugs introduced
+- [ ] Related features still work
+- [ ] Error messages are clear
+- [ ] Logs capture the issue properly
+
+## Common Issues Checklist
+
+### JavaScript Errors
+- [ ] Check for undefined variables
+- [ ] Verify function signatures match usage
+- [ ] Check for null/undefined before accessing properties
+- [ ] Ensure async/await is used correctly
+- [ ] Verify event listeners are attached
+
+### API Issues
+- [ ] Verify endpoint URL is correct
+- [ ] Check authentication token is included
+- [ ] Verify request body format matches backend
+- [ ] Check CORS headers if cross-origin
+- [ ] Verify HTTP method (GET, POST, PUT, DELETE)
+
+### CSS Issues
+- [ ] Check browser DevTools Styles panel for overrides
+- [ ] Verify CSS file is loaded (Network tab)
+- [ ] Check for typos in class names
+- [ ] Verify CSS custom properties are defined
+- [ ] Test responsive breakpoints
+
+### Database Issues
+- [ ] Verify user_id matches authenticated user
+- [ ] Check RLS policies allow the operation
+- [ ] Verify foreign keys exist
+- [ ] Check data types match schema
+- [ ] Ensure timestamps are in correct format
+
+### PowerShell Script Issues
+**See `powershell.mdc` for complete PowerShell scripting rules.**
+
+Common PowerShell debugging issues:
+- [ ] URL construction errors with `&` character
+- [ ] Unicode character encoding issues
+- [ ] Environment variable loading failures
+- [ ] Null reference errors in response handling
+- [ ] String concatenation with line continuations
+
+**Quick fixes:**
+- Build URLs in variables before use (don't use `&` inline with backticks)
+- Use `[PASS]`/`[FAIL]` instead of Unicode characters (✓/✗)
+- Verify `.env` file exists and variables are loaded
+- Check for null before accessing `$response.data`
+- Use `-ErrorAction Stop` on `Invoke-RestMethod` calls
+
+## Debug Logging
+
+**See `logging.mdc` for complete logging rules.**
+
+### Add Debug Logs During Investigation
+```javascript
+import logger from '../utils/logger.js';
+
+// Enable debug mode in localStorage
+localStorage.setItem('DEBUG_MODE', 'true');
+
+// Add debug logs
+logger.debug('[Module] Starting operation', { data });
+logger.debug('[Module] Checkpoint', { variable, state });
+logger.debug('[Module] Result', { result });
+```
+
+### Clean Up After Debugging
+Before committing:
+- Set DEBUG_MODE back to false
+- Keep `logger.debug()` calls (they won't output when debug disabled)
+- Remove any temporary `console.log()` statements
+- Keep `logger.error()` for actual error handling
+- Keep `logger.info()` for important state changes
+
+## Testing After Fix
+
+### Manual Testing
+1. Test the exact scenario that caused the bug
+2. Test edge cases (empty data, null values, boundaries)
+3. Test on mobile and desktop
+4. Test with different data
+
+### Regression Testing
+1. Test related features to ensure they still work
+2. Check dashboard updates correctly
+3. Verify logs are created
+4. Test navigation between pages
+
+## Documentation
+
+### Update After Fix
+If the bug revealed a gap in understanding:
+- Update README with clarifications
+- Add comments to complex code
+- Document known edge cases
+- Update CURSOR_PROMPTS if implementation guidance was wrong
+
+## Summary Template
+
+After fixing, provide:
+```
+Bug: [Brief description]
+Cause: [Root cause]
+Fix: [What was changed]
+Files Modified: [List files]
+Testing: [How it was verified]
+```

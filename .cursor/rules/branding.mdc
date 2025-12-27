@@ -1,0 +1,118 @@
+---
+description: Branding & Design System — Professional Portfolio Theme
+alwaysApply: true
+priority: 1
+---
+
+# Branding & Design System (Portfolio)
+
+## Source of Truth
+
+**ALWAYS refer to `docs/branding-guide.html` for the exact tokens, typography, and component styling.**
+
+This replaces the prior pixel-art guide. The portfolio site is **professional and employer-facing**.
+
+> Why tokens: CSS custom properties let you define design values once and reuse them everywhere for consistency and fast updates. (This is the intended use of CSS custom properties.)  
+
+## Brand Goals
+
+- **Credible + readable** (journalism/research)
+- **Proof-forward** (artifacts beat claims)
+- **Scannable** (employer skim in <30 seconds)
+- **Accessible** (keyboard focus visible; contrast meets WCAG minimums)
+
+## Design Token Rules
+
+### Token naming
+Use **semantic tokens** (what the color *means*), not literal names (e.g., avoid `--gold-500` in components).
+
+**Required tokens** (match HTML):
+- `--bg`, `--surface`, `--surface-2`
+- `--text`, `--muted`, `--border`
+- `--brand`, `--brand-ink`
+- `--info`, `--success`, `--warning`, `--danger`
+- `--focus`, `--focus-outer`
+
+> Keep these declared in `:root`. Optional theme switching can be done with `[data-theme="dark"]`.
+
+### Accessibility minimums
+- Text contrast should meet **WCAG 1.4.3** (4.5:1 normal text, 3:1 large text).
+- Focus indicators should be clearly visible (WCAG 2.2 focus appearance guidance).
+
+**Focus style (required):**
+- Use `:focus-visible` with a 3px outline + 2px offset and an outer glow.
+- Do not remove outlines.
+
+## Typography
+
+- **Headings:** `Newsreader` (serif) for credibility / editorial feel.
+- **Body/UI:** `Inter` for clean UI readability.
+
+**Hierarchy:**
+- H1: serif, 36–48px
+- H2: serif, 24–32px
+- Body: 16–18px, line-height 1.6–1.8
+- Meta/captions: 12–14px, muted
+
+## Layout Standards
+
+- Max content width: `1100px`
+- Default page padding: `20px`
+- Sections: 40–64px vertical spacing
+- Cards: radius 14px, 1px border, soft shadow
+
+## Components
+
+### Buttons (required variants)
+
+Base class: `.btn`
+- Inline-flex, 10px/14px padding, radius 12px, font-weight 600
+- `:active` translates down 1px
+- Hover: subtle (no dramatic motion)
+
+Variants:
+- `.btn-primary` — **Brand** CTA (gold). Use sparingly (1 primary action per section).
+- `.btn-secondary` — Outline / neutral.
+- `.btn-ghost` — Minimal emphasis.
+- `.btn-danger` — Destructive only.
+
+### Cards
+- `.card` — elevated card with shadow (use for major sections)
+- `.card-flat` — flat card (lists, small panels)
+
+### Pills / Tags
+- `.pill` — small tag for: tools, years, role types, categories.
+- Keep tags factual (no hype like “elite” or “unmatched”).
+
+### Form fields
+- `.field` — 12px radius, 1px border, clear placeholder, strong focus ring.
+
+## Content rules (employer-facing)
+
+- Prefer **measurable facts** + supporting artifacts:
+  - Journalism: clip links + date + outlet
+  - Research: poster, abstract, role, tooling (E-Prime)
+  - Ops: budgets/workflows + award photo
+- Avoid fluff adjectives (“passionate”, “hardworking”) unless backed by evidence.
+- Avoid jargon and startup-speak.
+
+## Tailwind mapping (if using Tailwind theme tokens)
+
+If you're using Tailwind theme variables, map them to CSS variables:
+
+- `bg-[color:var(--bg)]`
+- `text-[color:var(--text)]`
+- `border-[color:var(--border)]`
+- For buttons, prefer component classes (`btn btn-primary`) to keep styling centralized.
+
+## Do / Don’t
+
+✅ DO
+- Keep 1 primary CTA per page section
+- Use consistent spacing + headings
+- Ensure keyboard focus is visible everywhere
+
+❌ DON’T
+- Use heavy gradients, neon palettes, or noisy backgrounds
+- Use more than 2 typefaces
+- Add “stats” you cannot defend

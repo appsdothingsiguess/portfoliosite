@@ -1,0 +1,174 @@
+---
+description: Branding & Design System - Pixel Art Theme
+alwaysApply: true
+priority: 1
+---
+
+# Branding & Design System
+
+## Source of Truth
+
+**ALWAYS refer to `docs/branding-guide.html` for the exact color codes, font families, and component styles.**
+
+## Core Design Rules
+
+### Pixel Art Theme
+- **NO smooth gradients or rounded corners** (unless pixelated)
+- **ALL images must use the `.pixel-art` utility class** (image-rendering: pixelated)
+- **Borders:** Use chunky 4px solid borders
+
+### Color Palette (Dark Mode)
+- **Background:** `#2D1B4E` (Deep Indigo) - `var(--bg-dark)`
+- **Card Background:** `#433D60` - `var(--card-bg)`
+- **Primary Action:** `#FF70A6` (Bubblegum Pink) - `var(--primary)`
+- **Secondary Action:** `#70D6FF` (Electric Blue) - `var(--secondary)`
+- **Accent/Badge:** `#E9FF70` (Neon Lime) - `var(--accent)`
+- **Gold/Currency:** `#FFD670` - `var(--gold)`
+
+### Typography
+- **Headings:** `'Press Start 2P'` (Use sparingly for big titles)
+- **Body:** `'VT323'` (Terminal style, readable)
+
+## UI Components
+
+### Buttons
+
+**CRITICAL:** All buttons MUST use the global button classes defined in `shop/assets/css/style.css`.
+
+**Base Class:** `.pixel-btn`
+- 4px solid borders
+- Light top/left border: `rgba(255, 255, 255, 0.3)`
+- Dark bottom/right border: `rgba(0, 0, 0, 0.3)`
+- Active state: `translateY(4px)`, `border-width: 2px`
+- Hover: `brightness(1.1)`
+
+**Color Variants:**
+- `.pixel-btn-primary` - Primary actions (Pink background, white text)
+- `.pixel-btn-secondary` - Secondary actions (Blue background, black text)
+- `.pixel-btn-accent` - Accent actions (Lime background, black text)
+- `.pixel-btn-gold` - Currency/rare actions (Gold background, black text)
+- `.pixel-btn-danger` - Destructive actions (Red background, white text)
+- `.pixel-btn-disabled` - Disabled state (Gray background, gray text)
+
+**Usage:**
+```html
+<!-- ✅ CORRECT -->
+<button class="pixel-btn pixel-btn-primary px-4 py-2 text-sm">BUY</button>
+<button class="pixel-btn pixel-btn-secondary px-4 py-2 text-sm">CANCEL</button>
+<button class="pixel-btn pixel-btn-danger px-4 py-2 text-sm">DELETE</button>
+
+<!-- ❌ WRONG - Don't use inline bg-* classes with pixel-btn -->
+<button class="pixel-btn bg-primary text-white">BUY</button>
+```
+
+**Legacy Support:** `.pixel-btn-3d` is an alias for `.pixel-btn` but prefer `.pixel-btn` for new code.
+
+### Item Cards
+
+**CRITICAL:** All item cards MUST use the `.item-card` class.
+
+**Required Classes:**
+- `.item-card` - Base class (includes border-4 border-primary, hover:scale-105)
+- Background: `var(--bg-dark)` (#2D1B4E)
+- Border: `4px solid var(--primary)` (#FF70A6)
+- Hover effect: `scale(1.05)` transition
+- Padding: `1rem`
+- Position: `relative` (for badges)
+
+**Usage:**
+```html
+<!-- ✅ CORRECT -->
+<div class="item-card">
+    <img src="..." class="pixel-art" alt="Item">
+    <h3 class="text-2xl text-white font-['Press_Start_2P']">Item Name</h3>
+    <p class="text-gold text-xl">💰 100</p>
+</div>
+
+<!-- ❌ WRONG - Missing hover effect and proper border -->
+<div class="bg-[#2D1B4E] border-2">...</div>
+```
+
+**Admin Item Cards:** Use `.item-card.admin-item-card` to disable hover (admin cards are not clickable).
+
+### Cards
+
+**Base Card:** `.pixel-card`
+- Background: `var(--card-bg)` (#433D60)
+- Border: `4px solid #000`
+- Box-shadow: `8px 8px 0 0 rgba(0, 0, 0, 0.5)`
+- Padding: `1.5rem`
+
+### Images
+
+**CRITICAL:** ALL images MUST have the `.pixel-art` class to prevent blurring.
+
+```html
+<!-- ✅ CORRECT -->
+<img src="..." class="pixel-art" alt="Sprite">
+
+<!-- ❌ WRONG - Image will be blurred -->
+<img src="..." alt="Sprite">
+```
+
+**CSS Rule (MUST be in style.css):**
+```css
+.pixel-art {
+    image-rendering: pixelated;       /* Chrome/Safari */
+    image-rendering: -moz-crisp-edges; /* Firefox */
+    image-rendering: crisp-edges;     /* Standard */
+}
+```
+
+## Layout Guidelines
+
+### Headers
+- Use `flex items-center justify-between gap-4` for header layouts
+- Add `flex-wrap` for responsive behavior
+- Use `flex-shrink-0` on button groups to prevent squishing
+- Buttons should be grouped in a container: `<div class="flex gap-3 items-center">`
+
+### Spacing
+- Use consistent gaps: `gap-3` for button groups, `gap-4` for header elements
+- Padding: `px-4 py-2` for standard buttons, `px-3 py-1` for small buttons
+
+## The "Vibe" Checklist
+
+✅ **Dark Mode Default:** Easy on the eyes, makes neon colors pop
+✅ **Chunky Borders:** Everything has a 2px-4px solid border
+✅ **No Smoothing:** All images use `image-rendering: pixelated`
+✅ **Juicy Feedback:** Buttons press down, hover states lift up
+✅ **Kawaii Copy:** Use "Opps!" instead of "Error", "Yay!" instead of "Success"
+
+## Common Mistakes to Avoid
+
+❌ **Don't mix Tailwind bg-* classes with pixel-btn** - Use the color variant classes instead
+❌ **Don't forget .pixel-art on images** - Images will blur without it
+❌ **Don't use border-2 on item cards** - Must be border-4 border-primary
+❌ **Don't forget hover effects on item cards** - Must have hover:scale-105
+❌ **Don't use rounded corners** - Pixel art theme requires sharp edges
+
+## CSS Variables Reference
+
+All colors are defined in `shop/assets/css/style.css`:
+
+```css
+:root {
+    --bg-dark: #2D1B4E;
+    --card-bg: #433D60;
+    --primary: #FF70A6;
+    --secondary: #70D6FF;
+    --accent: #E9FF70;
+    --gold: #FFD670;
+    --text-light: #FFFFFF;
+    --text-dark: #000000;
+}
+```
+
+## Quick Reference
+
+**Button:** `class="pixel-btn pixel-btn-primary px-4 py-2 text-sm"`
+**Item Card:** `class="item-card"`
+**Image:** `class="pixel-art"`
+**Card:** `class="pixel-card"`
+**Primary Text:** `class="text-primary"`
+**Gold Text:** `class="text-gold"`

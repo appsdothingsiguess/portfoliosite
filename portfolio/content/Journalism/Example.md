@@ -1,0 +1,1 @@
+title: "Budget Shortfalls in Campus Housing" publication: "The Chimes" date: 2024-03-12 type: "Article" url: "https://www.google.com/search?q=https://chimesnewspaper.com/article/housing-budget" impact: "Resulted in Senate Inquiry" summary: "Analyzed 500+ pages of budget documents to reveal a $2M discrepancy in student housing allocations."

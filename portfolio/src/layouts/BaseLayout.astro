@@ -1,0 +1,44 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+}
+
+const { title = 'Joseph Abboud - Portfolio' } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="description" content="Portfolio of Joseph Abboud" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <slot />
+    <script src="https://unpkg.com/lucide@latest" defer></script>
+    <script is:inline>
+      // Wait for DOM and Lucide to be ready
+      function initLucide() {
+        if (typeof lucide !== 'undefined') {
+          lucide.createIcons();
+        } else {
+          // Retry if Lucide hasn't loaded yet
+          setTimeout(initLucide, 50);
+        }
+      }
+      
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+          setTimeout(initLucide, 100);
+        });
+      } else {
+        setTimeout(initLucide, 100);
+      }
+    </script>
+  </body>
+</html>
+

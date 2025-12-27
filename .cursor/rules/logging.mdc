@@ -1,0 +1,621 @@
+---
+description: Logging system for Joey's Wellness Tracker with debug and regular modes
+alwaysApply: true
+priority: 1
+---
+
+# Logging Rules
+
+## Overview
+This project uses a two-tier logging system:
+1. **Regular logging** - Always active, logs important events
+2. **Debug logging** - Only when debug mode enabled, logs detailed troubleshooting info
+
+Both log to browser console (frontend) and Winston logger (backend).
+
+---
+
+## Logger API
+
+### Frontend Logger (`js/utils/logger.js`)
+
+**Standard Logging:**
+```javascript
+logger.info(message, context);   // Important state changes
+logger.warn(message, context);   // Warnings, unexpected behavior
+logger.error(message, context);  // Errors, failures
+```
+
+**Debug Logging:**
+```javascript
+logger.debug(message, context);  // Only logs when DEBUG_MODE = true
+```
+
+Where:
+- `message` - Short human-readable description
+- `context` - Optional object with additional data
+
+### Backend Logger (`backend/utils/logger.js`)
+
+**Standard Logging:**
+```javascript
+logger.info(message, meta);      // Important state changes
+logger.warn(message, meta);      // Warnings
+logger.error(message, meta);     // Errors, failures
+```
+
+**Debug Logging:**
+```javascript
+logger.debug(message, meta);     // Only logs when DEBUG_MODE = true
+```
+
+---
+
+## Debug Mode Configuration
+
+### Enabling Debug Mode
+
+**Frontend:**
+```javascript
+// Add to localStorage
+localStorage.setItem('DEBUG_MODE', 'true');
+
+// Or set in config
+const DEBUG_MODE = true;  // Change to false for production
+```
+
+**Backend:**
+```javascript
+// .env file
+DEBUG_MODE=true  // Set to false in production
+```
+
+### Debug Mode Behavior
+
+**When DEBUG_MODE = true:**
+- All `logger.debug()` calls output
+- Detailed logging for every operation
+- Function entry/exit logged
+- Decision points logged
+- Loop iterations logged (when needed)
+
+**When DEBUG_MODE = false:**
+- `logger.debug()` calls do nothing (early return)
+- Zero performance overhead
+- Only regular logs (info, warn, error) output
+
+---
+
+## When to Use Each Log Level
+
+### Regular Logging (Always Active)
+
+**Use `logger.info()`:**
+- User logged in/out
+- Medication logged
+- Sleep recorded
+- Assignment created/updated
+- Data exported
+- Important state transitions
+- API requests (before sending)
+- API success responses
+
+**Use `logger.warn()`:**
+- Missing optional data
+- Deprecated function called
+- Fallback behavior triggered
+- Unusual but valid state
+- Rate limiting approached
+
+**Use `logger.error()`:**
+- API request failed
+- Database operation failed
+- Validation failed
+- Authentication failed
+- Network error
+- Parsing error
+- Unexpected exception
+
+### Debug Logging (Only When Enabled)
+
+**Use `logger.debug()`:**
+- Function entry/exit
+- Variable values during execution
+- Conditional branch taken
+- Loop iterations (when debugging loops)
+- Internal state inspection
+- Detailed API request/response bodies
+- Query parameters before sending
+- Detailed error information
+
+---
+
+## Logging Patterns
+
+### Frontend Patterns
+
+**API Call Pattern:**
+```javascript
+// Regular log: API call start
+logger.info('Fetching medication logs', { 
+  startDate, 
+  endDate 
+});
+
+// Debug log: Request details
+logger.debug('API request details', {
+  url: '/api/medication',
+  method: 'GET',
+  params: { startDate, endDate },
+  headers: { Authorization: '...' }
+});
+
+try {
+  const response = await fetch(url);
+  
+  // Debug log: Response details
+  logger.debug('API response received', {
+    status: response.status,
+    statusText: response.statusText,
+    headers: Object.fromEntries(response.headers)
+  });
+  
+  if (!response.ok) {
+    // Regular log: Error
+    logger.error('API request failed', {
+      url,
+      status: response.status,
+      statusText: response.statusText
+    });
+    throw new Error(`HTTP ${response.status}`);
+  }
+  
+  const data = await response.json();
+  
+  // Regular log: Success
+  logger.info('Medication logs loaded', { 
+    count: data.length 
+  });
+  
+  // Debug log: Data details
+  logger.debug('Medication logs data', { data });
+  
+  return data;
+  
+} catch (error) {
+  // Regular log: Exception
+  logger.error('Failed to fetch medication logs', {
+    error: error.message,
+    stack: error.stack
+  });
+  throw error;
+}
+```
+
+**State Change Pattern:**
+```javascript
+function updateAssignmentStatus(id, newStatus) {
+  // Debug log: Function entry
+  logger.debug('updateAssignmentStatus called', { id, newStatus });
+  
+  const oldStatus = currentStatus;
+  
+  // Debug log: State before change
+  logger.debug('Current state', { oldStatus, newStatus });
+  
+  // Update state
+  currentStatus = newStatus;
+  
+  // Regular log: Important change
+  logger.info('Assignment status updated', { 
+    id, 
+    oldStatus, 
+    newStatus 
+  });
+  
+  // Debug log: State after change
+  logger.debug('Updated state', { currentStatus });
+}
+```
+
+**Event Handler Pattern:**
+```javascript
+function handleMedicationCheckbox(event) {
+  // Debug log: Handler entry
+  logger.debug('Medication checkbox clicked', {
+    target: event.target.id,
+    checked: event.target.checked
+  });
+  
+  const { date, medicationType, timeOfDay } = getDataFromElement(event.target);
+  
+  // Debug log: Extracted data
+  logger.debug('Extracted medication data', {
+    date,
+    medicationType,
+    timeOfDay
+  });
+  
+  // Regular log: Action
+  logger.info('Logging medication', {
+    date,
+    medicationType,
+    status: event.target.checked ? 'taken' : 'missed'
+  });
+  
+  // Save to API...
+}
+```
+
+### Backend Patterns
+
+**Express Route Pattern:**
+```javascript
+router.post('/api/medication', verifyToken, async (req, res) => {
+  // Debug log: Request received
+  logger.debug('POST /api/medication', {
+    userId: req.user.id,
+    body: req.body
+  });
+  
+  // Regular log: Operation start
+  logger.info('Creating medication log', {
+    userId: req.user.id,
+    medicationType: req.body.medication_type
+  });
+  
+  try {
+    // Debug log: Before database operation
+    logger.debug('Inserting into database', {
+      table: 'medication_logs',
+      data: req.body
+    });
+    
+    const result = await supabase
+      .from('medication_logs')
+      .insert({
+        user_id: req.user.id,
+        ...req.body,
+        created_at: new Date()
+      });
+    
+    // Debug log: Database result
+    logger.debug('Database insert result', { result });
+    
+    if (result.error) {
+      // Regular log: Database error
+      logger.error('Database insert failed', {
+        error: result.error.message,
+        details: result.error.details
+      });
+      throw result.error;
+    }
+    
+    // Regular log: Success
+    logger.info('Medication log created', {
+      id: result.data.id,
+      userId: req.user.id
+    });
+    
+    res.json({ success: true, data: result.data });
+    
+  } catch (error) {
+    // Regular log: Exception
+    logger.error('Failed to create medication log', {
+      error: error.message,
+      stack: error.stack,
+      userId: req.user.id
+    });
+    res.status(500).json({ error: 'Failed to create log' });
+  }
+});
+```
+
+**Database Operation Pattern:**
+```javascript
+async function updateSleepLog(id, updates) {
+  // Debug log: Function entry
+  logger.debug('updateSleepLog called', { id, updates });
+  
+  // Get current state
+  const { data: current } = await supabase
+    .from('sleep_logs')
+    .select('*')
+    .eq('id', id)
+    .single();
+  
+  // Debug log: Current state
+  logger.debug('Current sleep log', { current });
+  
+  // Regular log: Operation
+  logger.info('Updating sleep log', { id });
+  
+  const { data, error } = await supabase
+    .from('sleep_logs')
+    .update(updates)
+    .eq('id', id)
+    .select()
+    .single();
+  
+  if (error) {
+    // Regular log: Error
+    logger.error('Failed to update sleep log', {
+      id,
+      error: error.message,
+      updates
+    });
+    throw error;
+  }
+  
+  // Debug log: New state
+  logger.debug('Updated sleep log', { data });
+  
+  // Regular log: Success
+  logger.info('Sleep log updated', { 
+    id,
+    changes: Object.keys(updates)
+  });
+  
+  return data;
+}
+```
+
+---
+
+## Log Format Standards
+
+### Message Format
+```
+[LEVEL][MODULE] Action: brief description
+```
+
+**Examples:**
+```javascript
+logger.info('[Medication] Logged dose');
+logger.error('[API] Request failed: POST /api/medication');
+logger.debug('[Sleep] Calculating hours: start=22:00, end=06:00');
+```
+
+### Context Object Structure
+```javascript
+{
+  // Core identifiers
+  userId: 'user123',
+  id: '456',
+  
+  // Action context
+  action: 'create',
+  resource: 'medication_log',
+  
+  // Relevant data
+  data: { /* only relevant fields */ },
+  
+  // For errors
+  error: error.message,
+  stack: error.stack,
+  
+  // Timing (optional)
+  duration: 123,  // milliseconds
+  timestamp: new Date().toISOString()
+}
+```
+
+---
+
+## What to Log
+
+### MUST Log (Regular)
+
+**External API calls:**
+- Before request (info)
+- On success (info)
+- On failure (error)
+
+**Database operations:**
+- Before mutation (info)
+- On success (info)
+- On failure (error)
+
+**User actions:**
+- Medication logged
+- Sleep recorded
+- Assignment created/updated/deleted
+- Status changed
+- Due date changed
+
+**Authentication:**
+- Login success
+- Login failure
+- Logout
+- Token refresh
+
+**Errors:**
+- API failures
+- Database failures
+- Validation errors
+- Network errors
+- Unexpected exceptions
+
+**State transitions:**
+- Assignment status changed
+- Medication marked missed
+- Sleep log deleted
+
+### SHOULD Log (Debug)
+
+**Function flow:**
+- Entry with parameters
+- Exit with return value
+
+**Decision points:**
+- If/else branches taken
+- Switch case hit
+- Filter applied
+
+**Data processing:**
+- Loop iterations (for complex processing)
+- Transformations applied
+- Calculations performed
+
+**Internal state:**
+- Variable values at checkpoints
+- State before/after changes
+
+---
+
+## What NOT to Log
+
+### NEVER Log:
+- Passwords or tokens (redact them)
+- Full user objects with sensitive data
+- API keys or secrets
+- Credit card or payment info
+- Full request/response bodies in regular logs (debug only)
+
+### Avoid:
+- Duplicate information
+- Trivial loop iterations
+- Excessive debug logs in tight loops
+- Large objects (summarize instead)
+
+---
+
+## Logger Implementation
+
+### Frontend Logger (`js/utils/logger.js`)
+
+```javascript
+// Check localStorage or config for debug mode
+const DEBUG_MODE = localStorage.getItem('DEBUG_MODE') === 'true';
+
+const logger = {
+  info(message, context = {}) {
+    console.info(`[INFO]${message}`, context);
+  },
+  
+  warn(message, context = {}) {
+    console.warn(`[WARN]${message}`, context);
+  },
+  
+  error(message, context = {}) {
+    console.error(`[ERROR]${message}`, context);
+  },
+  
+  debug(message, context = {}) {
+    if (!DEBUG_MODE) return;  // Early return, zero overhead
+    console.debug(`[DEBUG]${message}`, context);
+  }
+};
+
+export default logger;
+```
+
+### Backend Logger (`backend/utils/logger.js`)
+
+```javascript
+import winston from 'winston';
+
+const DEBUG_MODE = process.env.DEBUG_MODE === 'true';
+
+const logger = winston.createLogger({
+  level: DEBUG_MODE ? 'debug' : 'info',
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.errors({ stack: true }),
+    winston.format.json()
+  ),
+  transports: [
+    new winston.transports.Console({
+      format: winston.format.simple()
+    }),
+    new winston.transports.File({ 
+      filename: 'logs/error.log', 
+      level: 'error' 
+    }),
+    new winston.transports.File({ 
+      filename: 'logs/combined.log' 
+    })
+  ]
+});
+
+// Wrap debug to check mode
+const originalDebug = logger.debug.bind(logger);
+logger.debug = (message, meta) => {
+  if (!DEBUG_MODE) return;  // Early return
+  originalDebug(message, meta);
+};
+
+export default logger;
+```
+
+---
+
+## Best Practices
+
+### 1. Log at the Right Level
+- Don't use `info` for debug details
+- Don't use `debug` for important events
+- Always use `error` for failures
+
+### 2. Include Sufficient Context
+```javascript
+// ❌ BAD - Not enough context
+logger.error('Save failed');
+
+// ✅ GOOD - Sufficient context
+logger.error('Failed to save medication log', {
+  userId,
+  date,
+  medicationType,
+  error: error.message
+});
+```
+
+### 3. Use Consistent Format
+```javascript
+// All logs in same module use same prefix
+logger.info('[Medication] Logged dose');
+logger.error('[Medication] Failed to log dose');
+logger.debug('[Medication] Checkbox clicked');
+```
+
+### 4. Redact Sensitive Data
+```javascript
+// ❌ BAD
+logger.debug('Auth request', { password: '...' });
+
+// ✅ GOOD
+logger.debug('Auth request', { 
+  email: email,
+  password: '[REDACTED]' 
+});
+```
+
+### 5. Performance Consideration
+```javascript
+// ❌ BAD - Expensive operation even when debug disabled
+logger.debug('Complex data', { 
+  data: performExpensiveCalculation() 
+});
+
+// ✅ GOOD - Check debug mode first
+if (DEBUG_MODE) {
+  logger.debug('Complex data', { 
+    data: performExpensiveCalculation() 
+  });
+}
+```
+
+---
+
+## Checklist
+
+Before committing code:
+- [ ] Regular logs added for important events
+- [ ] Debug logs added for detailed troubleshooting
+- [ ] Sensitive data redacted
+- [ ] Consistent log format used
+- [ ] Sufficient context included
+- [ ] No excessive logging in loops
+- [ ] Debug mode check before expensive operations
+- [ ] Error logs include error message and stack

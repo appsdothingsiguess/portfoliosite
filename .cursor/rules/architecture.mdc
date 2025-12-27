@@ -1,0 +1,33 @@
+---
+description: A gamified, pixel-art e-commerce system built on the JAMstack.
+alwaysApply: false
+---
+
+
+Auth: User logs in via Google OAuth (Supabase).
+
+Load: App fetches profiles (points) and items (shop).
+
+Interact: Alpine.js updates local state (Merchant reactions).
+
+Transact: User clicks "Buy" -> Calls purchase_item RPC -> Updates DB.
+
+Notify: DB Trigger fires Discord Webhook.
+
+2. Key Components
+
+The Portal (/): Simple HTML/CSS entry point.
+
+The Shop (/shop/): Single Page Application (SPA) feel using standard HTML pages.
+
+The Merchant: shop/js/app.js controls the sprite state based on user actions.
+
+3. Server Config (Nginx)
+
+Ensure Nginx is configured to serve static files from /shop:
+
+location /shop {
+    alias /var/www/joeyspace.dev/shop;
+    index index.html;
+    try_files $uri $uri/ =404;
+}

@@ -1,0 +1,49 @@
+---
+description: Project structure and core technology constraints for Joey's Shop
+globs: 
+alwaysApply: true
+priority: 1
+---
+# Project Structure & Tech Stack
+
+## Core Philosophy
+- **Architecture:** Hybrid JAMstack.
+  - **Frontend:** Pre-built Static Files (Vite -> `dist/`).
+  - **Backend:** Node.js Express Service (for Admin/Uploads) + Supabase (DB/Auth).
+- **Theme:** "Kawaii Pixel Art" (16-bit aesthetic).
+
+## Directory Layout
+│
+├── index.html              # 🌍 PORTAL: Landing page ("Crossroads").
+│
+├── shop/                   # 🛍️ THE APP SOURCE (Development)
+│   ├── package.json        # 📦 Dependencies (Vite, etc.)
+│   ├── vite.config.js      # ⚙️ Build Configuration
+│   │
+│   ├── index.html          # 🔐 LOGIN Entry Point
+│   ├── market.html         # 🏪 SHOP Entry Point
+│   ├── admin.html          # 🛠️ ADMIN Entry Point
+│   │
+│   ├── js/                 # ⚙️ LOGIC (ES Modules)
+│   │   ├── main.js         # Entry point importing CSS & App
+│   │   ├── app.js          # Alpine.js logic
+│   │   └── supabase.js     # Supabase Config
+│   │
+│   ├── assets/             # 🎨 RAW ASSETS
+│   │   ├── css/style.css
+│   │   ├── sprites/
+│   │   └── audio/
+│   │
+│   └── backend/            # 🔌 BACKEND API (Excluded from Vite)
+│       ├── server.js
+│       └── ecosystem.config.js
+│
+└── shop/dist/              # 🚀 PRODUCTION BUILD (Do not edit manually)
+    ├── index.html
+    └── assets/             # Hashed assets (index.a4b3.js, style.9c2d.css)
+
+## Tech Constraints
+✅ **REQUIRED**
+- **Vite:** MUST be used for local dev (`npm run dev`) and production builds (`npm run build`).
+- **Alpine.js:** Used for UI state. Must be compatible with ES Modules (attach globals to `window`).
+- **Tailwind CSS:** (If used) must be processed via PostCSS/Vite.

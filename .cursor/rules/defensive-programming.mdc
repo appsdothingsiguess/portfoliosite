@@ -1,0 +1,525 @@
+---
+description: Defensive programming practices for safety and reliability
+alwaysApply: true
+priority: 1
+---
+
+# Defensive Programming
+
+## Critical Rules
+
+### 1. Array & Object Access
+
+**NEVER access nested properties without checking:**
+```javascript
+// ❌ BAD - Unsafe
+const value = data.user.profile.name;
+const item = array[0].property;
+
+// ✅ GOOD - Safe with null coalescing
+const value = data?.user?.profile?.name ?? 'Default';
+
+// ✅ GOOD - Explicit checks
+const value = data && data.user && data.user.profile 
+  ? data.user.profile.name 
+  : 'Default';
+
+// ✅ GOOD - Check array length
+const item = array.length > 0 ? array[0].property : null;
+```
+
+**ALWAYS validate array type:**
+```javascript
+// ✅ GOOD
+const logs = await getLogs();
+if (!Array.isArray(logs)) {
+  console.error('Expected array, got:', typeof logs);
+  return [];
+}
+```
+
+### 2. Division Safety
+
+**ALWAYS check for division by zero:**
+```javascript
+// ❌ BAD
+const average = total / count;
+const pages = Math.ceil(items / perPage);
+
+// ✅ GOOD
+const average = count > 0 ? total / count : 0;
+const pages = perPage > 0 ? Math.ceil(items / perPage) : 1;
+```
+
+### 3. Null/Undefined Checks
+
+**ALWAYS validate before use:**
+```javascript
+// ❌ BAD
+function process(data) {
+  return data.items.map(item => item.id);
+}
+
+// ✅ GOOD
+function process(data) {
+  if (!data) {
+    throw new Error('Data is required');
+  }
+  if (!Array.isArray(data.items)) {
+    throw new Error('data.items must be an array');
+  }
+  return data.items.map(item => item?.id).filter(Boolean);
+}
+```
+
+### 4. Concurrent Operation Guards
+
+**ALWAYS prevent duplicate async calls:**
+```javascript
+// ❌ BAD - No guard
+button.addEventListener('click', async () => {
+  await updateDatabase(); // Can be called multiple times!
+});
+
+// ✅ GOOD - Processing flag
+let isProcessing = false;
+
+button.addEventListener('click', async () => {
+  if (isProcessing) return;
+  isProcessing = true;
+  
+  try {
+    await updateDatabase();
+  } finally {
+    isProcessing = false;
+  }
+});
+
+// ✅ ALSO GOOD - Element-level flag
+button.addEventListener('click', async (e) => {
+  if (e.target.dataset.processing === 'true') return;
+  e.target.dataset.processing = 'true';
+  
+  try {
+    await updateDatabase();
+  } finally {
+    e.target.dataset.processing = 'false';
+  }
+});
+```
+
+### 5. Database Insert Validation
+
+**ALWAYS include required calculated fields:**
+```javascript
+// ❌ BAD - Missing calculated field
+await supabase.from('sleep_logs').insert({
+  sleep_time: sleepTime,
+  wake_time: wakeTime
+  // Missing hours! Will fail with NOT NULL constraint
+});
+
+// ✅ GOOD - Calculate before insert
+const hours = calculateHours(sleepTime, wakeTime);
+await supabase.from('sleep_logs').insert({
+  sleep_time: sleepTime,
+  wake_time: wakeTime,
+  hours: hours // Required field included
+});
+```
+
+### 6. Event Listener Attachment
+
+**ALWAYS attach listeners after DOM insertion:**
+```javascript
+// ❌ BAD - Listeners not attached
+container.innerHTML = '<button class="action-btn">Click</button>';
+// Button is dead!
+
+// ✅ GOOD - Attach immediately after
+container.innerHTML = '<button class="action-btn">Click</button>';
+document.querySelectorAll('.action-btn').forEach(btn => {
+  btn.addEventListener('click', handleAction);
+});
+```
+
+### 7. API Response Validation
+
+**ALWAYS validate API responses:**
+```javascript
+// ❌ BAD
+const data = await fetch('/api/medication').then(r => r.json());
+renderData(data.logs);
+
+// ✅ GOOD
+try {
+  const response = await fetch('/api/medication');
+  
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+  }
+  
+  const data = await response.json();
+  
+  if (!data || typeof data !== 'object') {
+    throw new Error('Invalid response format');
+  }
+  
+  if (!Array.isArray(data.logs)) {
+    console.warn('No logs in response, using empty array');
+    data.logs = [];
+  }
+  
+  renderData(data.logs);
+  
+} catch (error) {
+  console.error('[ERROR][API] Failed to fetch medication:', error);
+  showToast('Failed to load data', 'error');
+  renderData([]);  // Graceful fallback
+}
+```
+
+### 5. Date Validation
+
+**ALWAYS validate date inputs:**
+```javascript
+// ❌ BAD
+const date = new Date(input);
+const hours = (end - start) / 3600000;
+
+// ✅ GOOD
+function parseDate(input) {
+  const date = new Date(input);
+  if (isNaN(date.getTime())) {
+    throw new Error('Invalid date');
+  }
+  return date;
+}
+
+function calculateHours(start, end) {
+  const startDate = parseDate(start);
+  const endDate = parseDate(end);
+  
+  if (endDate <= startDate) {
+    throw new Error('End time must be after start time');
+  }
+  
+  return (endDate - startDate) / 3600000;
+}
+```
+
+### 6. Input Sanitization
+
+**ALWAYS sanitize user input:**
+```javascript
+// ❌ BAD
+element.innerHTML = userInput;
+const query = `SELECT * FROM users WHERE name = '${input}'`;
+
+// ✅ GOOD
+element.textContent = userInput;  // Safe from XSS
+// OR
+element.innerHTML = DOMPurify.sanitize(userInput);
+
+// Use parameterized queries (Supabase handles this)
+const { data } = await supabase
+  .from('users')
+  .select('*')
+  .eq('name', input);  // Safe
+```
+
+### 7. Error Logging
+
+**See `logging.mdc` for complete logging rules.**
+
+**ALWAYS log errors with context:**
+```javascript
+import logger from '../utils/logger.js';
+
+// ❌ BAD
+try {
+  await saveData(data);
+} catch (error) {
+  console.log('error');  // Unhelpful
+}
+
+// ✅ GOOD
+try {
+  await saveData(data);
+} catch (error) {
+  logger.error('[Module] Failed to save data', {
+    error: error.message,
+    stack: error.stack,
+    data: data,  // Include relevant context
+    timestamp: new Date().toISOString()
+  });
+  throw error;  // Re-throw if caller needs to handle
+}
+```
+
+### 8. Function Parameter Validation
+
+**ALWAYS validate required parameters:**
+```javascript
+// ❌ BAD
+function updateAssignment(id, status) {
+  return supabase
+    .from('assignments')
+    .update({ status })
+    .eq('id', id);
+}
+
+// ✅ GOOD
+function updateAssignment(id, status) {
+  if (!id) {
+    throw new Error('Assignment ID is required');
+  }
+  if (!status) {
+    throw new Error('Status is required');
+  }
+  
+  const validStatuses = ['not_started', 'in_progress', 'submitted'];
+  if (!validStatuses.includes(status)) {
+    throw new Error(`Invalid status. Must be one of: ${validStatuses.join(', ')}`);
+  }
+  
+  return supabase
+    .from('assignments')
+    .update({ status, updated_at: new Date() })
+    .eq('id', id);
+}
+```
+
+### 9. Async/Await Safety
+
+**ALWAYS use try-catch with async:**
+```javascript
+// ❌ BAD
+async function loadData() {
+  const data = await fetch('/api/data').then(r => r.json());
+  renderData(data);
+}
+
+// ✅ GOOD
+async function loadData() {
+  try {
+    const response = await fetch('/api/data');
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    
+    const data = await response.json();
+    renderData(data);
+    
+  } catch (error) {
+    console.error('[ERROR][Data] Load failed:', error);
+    renderError('Failed to load data');
+  }
+}
+```
+
+### 10. Event Listener Safety
+
+**ALWAYS remove event listeners:**
+```javascript
+// ❌ BAD
+function initPage() {
+  document.querySelector('.btn').addEventListener('click', handleClick);
+}
+
+// ✅ GOOD
+let cleanupFunctions = [];
+
+function initPage() {
+  const btn = document.querySelector('.btn');
+  const handler = () => handleClick();
+  
+  btn.addEventListener('click', handler);
+  
+  // Store cleanup function
+  cleanupFunctions.push(() => {
+    btn.removeEventListener('click', handler);
+  });
+}
+
+function cleanup() {
+  cleanupFunctions.forEach(fn => fn());
+  cleanupFunctions = [];
+}
+
+// Call cleanup when navigating away or re-initializing
+```
+
+## Database Operations
+
+### Check Query Results
+```javascript
+// ✅ GOOD - Check for errors and empty results
+const { data, error } = await supabase
+  .from('medication_logs')
+  .select('*')
+  .eq('user_id', userId);
+
+if (error) {
+  logger.error('Query failed', { error, userId });
+  throw error;
+}
+
+if (!data || data.length === 0) {
+  logger.info('No medication logs found', { userId });
+  return [];
+}
+
+return data;
+```
+
+### Validate Before Insert
+```javascript
+// ✅ GOOD
+async function createMedicationLog(logData) {
+  // Validate required fields
+  const required = ['user_id', 'date', 'medication_type', 'status'];
+  for (const field of required) {
+    if (!logData[field]) {
+      throw new Error(`${field} is required`);
+    }
+  }
+  
+  // Validate enums
+  const validMeds = ['lamotrigen', 'olanzapine'];
+  if (!validMeds.includes(logData.medication_type)) {
+    throw new Error(`Invalid medication type: ${logData.medication_type}`);
+  }
+  
+  // Insert
+  const { data, error } = await supabase
+    .from('medication_logs')
+    .insert(logData)
+    .select()
+    .single();
+  
+  if (error) throw error;
+  return data;
+}
+```
+
+## Frontend Safety
+
+### DOM Query Safety
+```javascript
+// ❌ BAD
+const element = document.querySelector('.my-element');
+element.textContent = 'Hello';  // May throw if null
+
+// ✅ GOOD
+const element = document.querySelector('.my-element');
+if (!element) {
+  console.warn('Element .my-element not found');
+  return;
+}
+element.textContent = 'Hello';
+```
+
+### LocalStorage Safety
+```javascript
+// ❌ BAD
+const token = localStorage.getItem('token');
+const data = JSON.parse(token);
+
+// ✅ GOOD
+function getStoredToken() {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) return null;
+    
+    return JSON.parse(token);
+  } catch (error) {
+    console.error('Failed to parse stored token:', error);
+    localStorage.removeItem('token');  // Clear corrupt data
+    return null;
+  }
+}
+```
+
+### Form Data Validation
+```javascript
+// ✅ GOOD
+function handleFormSubmit(event) {
+  event.preventDefault();
+  
+  const formData = new FormData(event.target);
+  const data = Object.fromEntries(formData);
+  
+  // Validate required fields
+  if (!data.medication_type || !data.status) {
+    showToast('Please fill in all required fields', 'error');
+    return;
+  }
+  
+  // Validate format
+  if (data.date) {
+    const date = new Date(data.date);
+    if (isNaN(date.getTime())) {
+      showToast('Invalid date format', 'error');
+      return;
+    }
+  }
+  
+  // Submit
+  submitData(data);
+}
+```
+
+## Edge Cases
+
+### Empty Arrays
+```javascript
+// Handle empty results gracefully
+const items = data.items || [];
+if (items.length === 0) {
+  renderEmptyState();
+  return;
+}
+```
+
+### Boundary Values
+```javascript
+// Test min, max, and edge values
+function setPage(pageNum, totalPages) {
+  if (pageNum < 1) pageNum = 1;
+  if (pageNum > totalPages) pageNum = totalPages;
+  return pageNum;
+}
+```
+
+### Race Conditions
+```javascript
+// Prevent multiple simultaneous submissions
+let isSubmitting = false;
+
+async function handleSubmit() {
+  if (isSubmitting) {
+    console.warn('Already submitting');
+    return;
+  }
+  
+  isSubmitting = true;
+  try {
+    await submitData();
+  } finally {
+    isSubmitting = false;
+  }
+}
+```
+
+## Checklist
+
+Before committing code:
+- [ ] All array/object access has null checks
+- [ ] All divisions check for zero
+- [ ] All API calls have error handling
+- [ ] All dates are validated
+- [ ] All user inputs are sanitized
+- [ ] All function parameters are validated
+- [ ] All async functions use try-catch
+- [ ] All event listeners are cleaned up
+- [ ] All database queries check for errors
+- [ ] All edge cases are handled

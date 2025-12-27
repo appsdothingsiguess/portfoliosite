@@ -1,0 +1,91 @@
+---
+alwaysApply: true
+description: Pixel Art CSS rules, Alpine.js patterns, and Security globs:
+---
+
+1. Visual Design System (Pixel Art)
+
+CRITICAL CSS RULE:
+All images must use nearest-neighbor scaling to prevent blurring. This class is MANDATORY for all sprites.
+
+/* Must be present in shop/assets/css/style.css */
+.pixel-art {
+    image-rendering: pixelated;       /* Chrome/Safari */
+    image-rendering: -moz-crisp-edges; /* Firefox */
+    image-rendering: crisp-edges;     /* Standard */
+}
+
+
+UI Components:
+
+Buttons: Chunky borders to simulate 3D depth (Light Top/Left, Dark Bottom/Right).
+
+Fonts: Use 'VT323' (Body) or 'Press Start 2P' (Headers).
+
+Colors: - Background: Deep Indigo #2D1B4E
+
+Primary: Bubblegum Pink #FF70A6
+
+Gold: #FFD670
+
+2. Alpine.js Best Practices
+
+State Management:
+Do not bloat HTML with complex JS. Extract logic into js/app.js.
+
+✅ GOOD:
+
+<div x-data="shopLogic()">
+    <button @click="buyItem(item)">Buy</button>
+</div>
+
+<!-- js/app.js -->
+function shopLogic() {
+    return {
+        items: [],
+        async buyItem(item) { ... }
+    }
+}
+
+
+❌ BAD:
+
+<div x-data="{ items: [], buyItem(i) { console.log('too much inline code') } }">
+
+
+3. Defensive Programming
+
+Audio:
+
+Autoplay Policy: Never play audio on page load. Only play SFX inside user-triggered events (@click, @keydown).
+
+Preload: Instantiate new Audio() objects in init() to avoid lag.
+
+Images:
+
+Fallbacks: Always include @error logic for dynamic sprites.
+
+<img :src="item.image" @error="$el.src = './assets/sprites/ui/missing.svg'">
+
+4. Asset Cache Busting
+
+**CRITICAL:** See `asset-cache-busting.mdc` for complete rules.
+
+**Quick Reference:**
+- ALL local CSS/JS assets MUST include `?v=X.X` version query strings
+- Use relative paths (`./assets/...`, `./js/...`)
+- CDN assets do NOT need version strings
+- Increment version when deploying changes
+
+**Example:**
+```html
+<!-- ✅ CORRECT -->
+<link rel="stylesheet" href="./assets/css/style.css?v=1.1">
+<script src="./js/app.js?v=1.1"></script>
+
+<!-- ❌ WRONG - Missing version string -->
+<link rel="stylesheet" href="./assets/css/style.css">
+<script src="./js/app.js"></script>
+```
+
+**Files to update:** `shop/index.html`, `shop/market.html`, `shop/admin.html`
