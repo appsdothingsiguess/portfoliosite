@@ -5,7 +5,6 @@ shortDesc: "Survey design and data collection platform"
 level: "Advanced"
 since: 2024
 order: 5
-category: "research"
 featured: true
 ---
 

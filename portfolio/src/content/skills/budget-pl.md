@@ -5,7 +5,6 @@ shortDesc: "Financial management and profit & loss analysis"
 level: "Advanced"
 since: 2022
 order: 8
-category: "business"
 featured: false
 ---
 

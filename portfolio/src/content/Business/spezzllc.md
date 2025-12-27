@@ -12,5 +12,6 @@ metrics:
     label: "Unique Customers"
 tags: ["E-Commerce", "Supply Chain", "P&L Management"]
 summary: "Built an e-commerce operation from 0 to 1. Handled inventory logistics, negotiated supplier contracts, and managed P&L for a profitable venture."
+modes: ["business"]
 ---
 

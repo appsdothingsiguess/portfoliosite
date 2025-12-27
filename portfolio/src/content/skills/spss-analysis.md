@@ -5,7 +5,6 @@ shortDesc: "Statistical analysis & data visualization"
 level: "Advanced"
 since: 2023
 order: 1
-category: "research"
 featured: true
 ---
 

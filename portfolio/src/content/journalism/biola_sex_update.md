@@ -7,3 +7,4 @@ url: "https://chimesnewspaper.com/55422/news/biola-updates-its-sexuality-gender-
 impact: "Announced to students the University's updated Sexuality, Gender and Relationships Policy"
 summary: "The university did not disclose the updated policy to students, and there were signfiicant changes that occured."
 ---
+

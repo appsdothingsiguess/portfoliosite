@@ -4,6 +4,16 @@ import { getCollection } from 'astro:content';
 import TechnicalSkills from '../components/TechnicalSkills.astro';
 import TopSkills from '../components/TopSkills.astro';
 
+// Determine current mode from URL params (server-side)
+const url = Astro.url;
+const params = url.searchParams;
+let currentMode: 'research' | 'business' | 'journalism' | 'aba' = 'aba';
+const hasExplicitMode = params.has('r') || params.has('b') || params.has('a') || params.has('j');
+if (params.has('r')) currentMode = 'research';
+if (params.has('b')) currentMode = 'business';
+if (params.has('a')) currentMode = 'aba';
+if (params.has('j')) currentMode = 'journalism';
+
 // 1. Fetch Data from Content Collections
 const researchDocs = await getCollection('research');
 const leadershipDocs = await getCollection('leadership');
@@ -11,15 +21,73 @@ const businessDocs = await getCollection('business');
 const journalismDocs = await getCollection('journalism');
 const skillsDocs = await getCollection('skills');
 
-// 2. Sort Data (Newest first)
-// Ensure fallback to empty array to prevent build errors if folder is empty
-const sortedResearch = (researchDocs || []).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
-const sortedJournalism = (journalismDocs || []).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
-const sortedLeadership = (leadershipDocs || []).sort((a, b) => b.data.dateStart.valueOf() - a.data.dateStart.valueOf());
-const sortedBusiness = (businessDocs || []).sort((a, b) => b.data.dateStart.valueOf() - a.data.dateStart.valueOf());
+// 2. Filter experiences by modes field
+// If no explicit mode param, show all experiences (default aba mode shows everything)
+// If explicit mode param, filter by that mode
+const filteredResearch = hasExplicitMode 
+  ? (researchDocs || []).filter(doc => doc.data.modes.includes(currentMode))
+  : (researchDocs || []);
+const filteredLeadership = hasExplicitMode
+  ? (leadershipDocs || []).filter(doc => doc.data.modes.includes(currentMode))
+  : (leadershipDocs || []);
+const filteredBusiness = hasExplicitMode
+  ? (businessDocs || []).filter(doc => doc.data.modes.includes(currentMode))
+  : (businessDocs || []);
+// Journalism articles don't need mode filtering - they're content pieces shown in all modes
+const filteredJournalism = journalismDocs || [];
+
+// 3. Sort Data (Newest first)
+const sortedResearch = filteredResearch.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const sortedJournalism = filteredJournalism.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const sortedLeadership = filteredLeadership.sort((a, b) => b.data.dateStart.valueOf() - a.data.dateStart.valueOf());
+const sortedBusiness = filteredBusiness.sort((a, b) => b.data.dateStart.valueOf() - a.data.dateStart.valueOf());
 const sortedSkills = (skillsDocs || []).sort((a, b) => 
   (a.data.order || 999) - (b.data.order || 999)
 );
+
+// 4. Hero content based on mode
+const heroContent = {
+  research: {
+    badge: { color: 'bg-blue-500', text: 'Specializing in Experimental Design & Data' },
+    title: 'Data-Driven Researcher & <br class="hidden md:block"/> Psychology Graduate.',
+    description: 'Leveraging E-Prime and SPSS to analyze behavioral patterns. Proven track record in protocol fidelity and participant management.'
+  },
+  aba: {
+    badge: { color: 'bg-green-500', text: 'Targeting RBT & Behavior Tech Roles' },
+    title: 'Behavior Technician & <br class="hidden md:block"/> Clinical Support.',
+    description: 'Implementing behavior intervention plans with fidelity. Experienced in data collection, pairing, and supporting clinical supervisors.'
+  },
+  business: {
+    badge: { color: 'bg-orange-500', text: 'Scaling Operations & Efficiency' },
+    title: 'Operations Leader & <br class="hidden md:block"/> Business Founder.',
+    description: 'From 0 to 1. I build systems, optimize budgets, and lead teams to execute complex projects under deadline.'
+  },
+  journalism: {
+    badge: { color: 'bg-purple-500', text: 'Available for Editorial & Media Roles' },
+    title: 'Investigative Journalist & <br class="hidden md:block"/> Media Manager.',
+    description: 'Asking the hard questions and verifying the facts. Experience managing newsrooms, editing copy, and producing multimedia content.'
+  }
+};
+
+const currentHero = heroContent[currentMode];
+
+// 5. Determine section order based on mode
+function getSectionOrder(mode: typeof currentMode): string[] {
+  switch (mode) {
+    case 'research':
+      return ['research', 'business-leadership', 'journalism'];
+    case 'business':
+      return ['business-leadership', 'journalism', 'research'];
+    case 'aba':
+      return ['research', 'business-leadership', 'journalism'];
+    case 'journalism':
+      return ['journalism', 'research', 'business-leadership'];
+    default:
+      return ['research', 'business-leadership', 'journalism'];
+  }
+}
+
+const sectionOrder = getSectionOrder(currentMode);
 ---
 
 <BaseLayout title="Joseph Abboud | Researcher & Operator">
@@ -48,17 +116,15 @@ const sortedSkills = (skillsDocs || []).sort((a, b) =>
       
       <!-- Dynamic Text Content -->
       <div class="flex-1 text-center md:text-left">
-        <div id="hero-badge" class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border bg-surface mb-6 shadow-sm">
-          <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-          <span class="text-xs font-medium text-muted">Targeting RBT & Research Roles</span>
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border bg-surface mb-6 shadow-sm">
+          <span class={`w-2 h-2 rounded-full ${currentHero.badge.color} animate-pulse`}></span>
+          <span class="text-xs font-medium text-muted">{currentHero.badge.text}</span>
         </div>
         
-        <h1 id="hero-title" class="text-4xl md:text-5xl lg:text-6xl font-serif font-bold leading-[1.1] mb-6 text-balance text-[var(--text)]">
-          Behavioral Science Researcher & <br class="hidden md:block"/> Operational Leader.
-        </h1>
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-serif font-bold leading-[1.1] mb-6 text-balance text-[var(--text)]" set:html={currentHero.title}></h1>
         
-        <p id="hero-desc" class="text-lg text-muted leading-relaxed max-w-xl mx-auto md:mx-0 mb-8">
-          I apply rigorous methodology to human behavior. With background in experimental design (E-Prime) and business operations, I bridge the gap between clinical protocol and execution.
+        <p class="text-lg text-muted leading-relaxed max-w-xl mx-auto md:mx-0 mb-8">
+          {currentHero.description}
         </p>
 
         <!-- Education Block -->
@@ -107,35 +173,32 @@ const sortedSkills = (skillsDocs || []).sort((a, b) =>
     </div>
   </header>
 
-  <main class="max-w-5xl mx-auto px-6 space-y-10 py-10">
+  <main class="max-w-5xl mx-auto px-6 py-10">
+    <style>
+      main {
+        display: flex;
+        flex-direction: column;
+        gap: 2.5rem;
+      }
+      [data-section-order="0"] { order: 0; }
+      [data-section-order="1"] { order: 1; }
+      [data-section-order="2"] { order: 2; }
+      [data-section-order="3"] { order: 3; }
+    </style>
 
     <!-- Section: Top Skills (Featured Skills) -->
     <!-- 
-      To edit Top Skills: Open any file in src/content/skills/*.md 
-      and set featured: true to make it appear here.
-      Example: Edit src/content/skills/spss-analysis.md and set featured: true
+      Skills are now derived relationally from experience files.
+      A skill appears here if it's referenced in the tools/tags of experience files
+      for the current mode (research, business, journalism, aba).
+      Set featured: true in skill files to prioritize them in the display.
     -->
-    <div id="top-skills-container" data-mode="research">
-      <TopSkills currentMode="research" />
+    <div id="top-skills-container" data-mode={currentMode}>
+      <TopSkills currentMode={currentMode} />
     </div>
 
-    <!-- Section: Technical Skills -->
-    <section id="skills" class="scroll-mt-24 transition-colors duration-1000 p-4 -m-4 rounded-2xl">
-      <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
-        <div>
-          <h2 class="text-3xl font-serif font-bold mb-2 flex items-center gap-2">
-            <i data-lucide="wrench" class="w-6 h-6 text-muted"></i>
-            Technical Toolkit & Certifications
-          </h2>
-          <p class="text-muted max-w-lg">Software proficiency, research tools, and professional certifications.</p>
-        </div>
-      </div>
-
-      <TechnicalSkills skills={sortedSkills} />
-    </section>
-
-    <!-- Section: Research (Uses <details> natively) -->
-    <section id="research" class="scroll-mt-24 transition-colors duration-1000 p-4 -m-4 rounded-2xl">
+    {/* Research Section */}
+    <section id="research" data-section-order={sectionOrder.indexOf('research')} class="scroll-mt-24 transition-colors duration-1000 p-4 -m-4 rounded-2xl">
       <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
         <div>
           <h2 class="text-3xl font-serif font-bold mb-2 flex items-center gap-2">
@@ -171,7 +234,7 @@ const sortedSkills = (skillsDocs || []).sort((a, b) =>
                   </div>
                 </div>
                 <div class="md:w-48 flex-shrink-0 md:border-l border-border md:pl-6 flex flex-col gap-3">
-                  <span class="text-xs font-bold uppercase tracking-wider text-muted">Tools</span>
+                  <span class="text-xs font-bold uppercase tracking-wider text-muted">Relevant Skills</span>
                   <div class="flex flex-wrap gap-2">
                     {item.data.tools.map((tool) => (
                       <span class="pill">{tool}</span>
@@ -215,21 +278,54 @@ const sortedSkills = (skillsDocs || []).sort((a, b) =>
       </div>
     </section>
 
-    <!-- Section: Business Ventures -->
-    {sortedBusiness.length > 0 && (
-      <section id="business" class="scroll-mt-24 transition-colors duration-1000 p-4 -m-4 rounded-2xl">
+    {/* Business & Leadership Section */}
+    {(sortedBusiness.length > 0 || sortedLeadership.length > 0) && (
+      <section id="business-leadership" data-section-order={sectionOrder.indexOf('business-leadership')} class="scroll-mt-24 transition-colors duration-1000 p-4 -m-4 rounded-2xl">
         <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
           <div>
             <h2 class="text-3xl font-serif font-bold mb-2 flex items-center gap-2">
-              <i data-lucide="trending-up" class="w-6 h-6 text-muted"></i>
-              Business Ventures
+              <i data-lucide="briefcase" class="w-6 h-6 text-muted"></i>
+              Business & Leadership
             </h2>
-            <p class="text-muted max-w-lg">E-commerce operations and business development.</p>
+            <p class="text-muted max-w-lg">E-commerce operations, business development, and team management.</p>
           </div>
         </div>
 
         <div class="grid md:grid-cols-2 gap-6">
+          {/* Business Ventures */}
           {sortedBusiness.map((item) => (
+            <div class="card p-6 md:p-8">
+              <div class="flex justify-between items-start mb-4">
+                <div>
+                  <h3 class="text-lg font-serif font-bold">{item.data.role}</h3>
+                  <div class="text-sm text-muted">{item.data.organization} • {item.data.dateStart.getFullYear()} - {item.data.dateEnd ? item.data.dateEnd.getFullYear() : 'Present'}</div>
+                </div>
+                {item.data.tags && item.data.tags.length > 0 && (
+                  <div class="flex flex-wrap gap-2">
+                    {item.data.tags.map((tag) => (
+                      <span class="pill">{tag}</span>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <p class="text-sm text-muted leading-relaxed mb-4">
+                {item.data.summary}
+              </p>
+              {item.data.metrics && (
+                <div class="flex gap-4 border-t border-border pt-4">
+                  {item.data.metrics.map((m) => (
+                    <div>
+                      <div class="text-lg font-bold font-serif">{m.value}</div>
+                      <div class="text-xs text-muted uppercase">{m.label}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+          
+          {/* Leadership Roles */}
+          {sortedLeadership.map((item) => (
             <div class="card p-6 md:p-8">
               <div class="flex justify-between items-start mb-4">
                 <div>
@@ -263,64 +359,8 @@ const sortedSkills = (skillsDocs || []).sort((a, b) =>
       </section>
     )}
 
-    <!-- Section: Operations & Leadership (Standard Grid) -->
-    <section id="leadership" class="scroll-mt-24 transition-colors duration-1000 p-4 -m-4 rounded-2xl">
-       <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
-        <div>
-          <h2 class="text-3xl font-serif font-bold mb-2 flex items-center gap-2">
-            <i data-lucide="briefcase" class="w-6 h-6 text-muted"></i>
-            Operations & Leadership
-          </h2>
-          <p class="text-muted max-w-lg">Managing budgets, workflows, and teams.</p>
-        </div>
-      </div>
-
-      <div class="grid md:grid-cols-3 gap-6">
-        <!-- Stat Cards -->
-        <div class="bg-surface border border-border rounded-xl p-6 flex flex-col justify-center items-center text-center">
-          <div class="text-4xl font-bold font-serif mb-1 text-[var(--brand-ink)]">$500K+</div>
-          <div class="text-xs text-muted font-medium uppercase tracking-wide">Gross Revenue</div>
-        </div>
-        <div class="bg-surface border border-border rounded-xl p-6 flex flex-col justify-center items-center text-center">
-          <div class="text-4xl font-bold font-serif mb-1 text-[var(--brand-ink)]">15+</div>
-          <div class="text-xs text-muted font-medium uppercase tracking-wide">Staff Managed</div>
-        </div>
-        <div class="bg-surface border border-border rounded-xl p-6 flex flex-col justify-center items-center text-center">
-           <div class="text-4xl font-bold font-serif mb-1 text-[var(--brand-ink)]">3x</div>
-          <div class="text-xs text-muted font-medium uppercase tracking-wide">Award Winner</div>
-        </div>
-
-        {sortedLeadership.map((item) => (
-          <div class="md:col-span-3 card p-6 md:p-8">
-            <div class="flex justify-between items-start">
-              <div>
-                <h3 class="text-lg font-serif font-bold">{item.data.role}</h3>
-                <div class="text-sm text-muted">{item.data.organization} • {item.data.dateStart.getFullYear()} - {item.data.dateEnd ? item.data.dateEnd.getFullYear() : 'Present'}</div>
-              </div>
-              {item.data.tags && item.data.tags.length > 0 && (
-                <span class="pill">{item.data.tags[0]}</span>
-              )}
-            </div>
-            <p class="mt-3 text-sm text-muted leading-relaxed">
-              {item.data.summary}
-            </p>
-             {item.data.metrics && (
-              <div class="mt-4 flex gap-4 border-t border-border pt-4">
-                {item.data.metrics.map((m) => (
-                  <div>
-                    <div class="text-lg font-bold font-serif">{m.value}</div>
-                    <div class="text-xs text-muted uppercase">{m.label}</div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    </section>
-
-    <!-- Section: Journalism -->
-    <section id="journalism" class="scroll-mt-24 transition-colors duration-1000 p-4 -m-4 rounded-2xl">
+    {/* Journalism Section */}
+    <section id="journalism" data-section-order={sectionOrder.indexOf('journalism')} class="scroll-mt-24 transition-colors duration-1000 p-4 -m-4 rounded-2xl">
       <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
         <div>
           <h2 class="text-3xl font-serif font-bold mb-2 flex items-center gap-2">
@@ -388,6 +428,21 @@ const sortedSkills = (skillsDocs || []).sort((a, b) =>
           </article>
         ))}
       </div>
+    </section>
+
+    {/* Technical Skills Section - Always at the end */}
+    <section id="skills" data-section-order="3" class="scroll-mt-24 transition-colors duration-1000 p-4 -m-4 rounded-2xl">
+      <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+        <div>
+          <h2 class="text-3xl font-serif font-bold mb-2 flex items-center gap-2">
+            <i data-lucide="wrench" class="w-6 h-6 text-muted"></i>
+            Technical Toolkit & Certifications
+          </h2>
+          <p class="text-muted max-w-lg">Software proficiency, research tools, and professional certifications.</p>
+        </div>
+      </div>
+
+      <TechnicalSkills skills={sortedSkills} />
     </section>
 
     <!-- Contact -->
@@ -553,51 +608,23 @@ const sortedSkills = (skillsDocs || []).sort((a, b) =>
       }));
     }
 
-    // 5. Update UI
-    const heroTitle = document.getElementById('hero-title');
-    const heroDesc = document.getElementById('hero-desc');
-    const heroBadge = document.getElementById('hero-badge');
+    // 5. Scroll to section if URL param is present (hero is now server-rendered)
     const researchSec = document.getElementById('research');
-    const leadershipSec = document.getElementById('leadership');
+    const businessLeadershipSec = document.getElementById('business-leadership');
     const journalismSec = document.getElementById('journalism');
 
-    if (heroTitle && heroDesc && heroBadge) {
-      if (currentMode === 'research') {
-        heroBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span><span class="text-xs font-medium text-muted">Specializing in Experimental Design & Data</span>';
-        heroTitle.innerHTML = 'Data-Driven Researcher & <br/> Psychology Graduate.';
-        heroDesc.innerText = 'Leveraging E-Prime and SPSS to analyze behavioral patterns. Proven track record in protocol fidelity and participant management.';
-        if(params.has('r')) {
-           setTimeout(() => researchSec?.scrollIntoView({ behavior: 'smooth' }), 500);
-           researchSec?.classList.add('animate-flash-focus');
-        }
-
-      } else if (currentMode === 'aba') {
-        heroBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span><span class="text-xs font-medium text-muted">Targeting RBT & Behavior Tech Roles</span>';
-        heroTitle.innerHTML = 'Behavior Technician & <br/> Clinical Support.';
-        heroDesc.innerText = 'Implementing behavior intervention plans with fidelity. Experienced in data collection, pairing, and supporting clinical supervisors.';
-        if(params.has('a')) {
-           setTimeout(() => researchSec?.scrollIntoView({ behavior: 'smooth' }), 500);
-           researchSec?.classList.add('animate-flash-focus');
-        }
-
-      } else if (currentMode === 'journalism') {
-        heroBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></span><span class="text-xs font-medium text-muted">Available for Editorial & Media Roles</span>';
-        heroTitle.innerHTML = 'Investigative Journalist & <br/> Media Manager.';
-        heroDesc.innerText = 'Asking the hard questions and verifying the facts. Experience managing newsrooms, editing copy, and producing multimedia content.';
-        if(params.has('j')) {
-           setTimeout(() => journalismSec?.scrollIntoView({ behavior: 'smooth' }), 500);
-           journalismSec?.classList.add('animate-flash-focus');
-        }
-
-      } else if (currentMode === 'business') {
-        heroBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span><span class="text-xs font-medium text-muted">Scaling Operations & Efficiency</span>';
-        heroTitle.innerHTML = 'Operations Leader & <br/> Business Founder.';
-        heroDesc.innerText = 'From 0 to 1. I build systems, optimize budgets, and lead teams to execute complex projects under deadline.';
-        if(params.has('b')) {
-           setTimeout(() => leadershipSec?.scrollIntoView({ behavior: 'smooth' }), 500);
-           leadershipSec?.classList.add('animate-flash-focus');
-        }
-      }
+    if (params.has('r') && researchSec) {
+      setTimeout(() => researchSec.scrollIntoView({ behavior: 'smooth' }), 500);
+      researchSec.classList.add('animate-flash-focus');
+    } else if (params.has('a') && researchSec) {
+      setTimeout(() => researchSec.scrollIntoView({ behavior: 'smooth' }), 500);
+      researchSec.classList.add('animate-flash-focus');
+    } else if (params.has('j') && journalismSec) {
+      setTimeout(() => journalismSec.scrollIntoView({ behavior: 'smooth' }), 500);
+      journalismSec.classList.add('animate-flash-focus');
+    } else if (params.has('b') && businessLeadershipSec) {
+      setTimeout(() => businessLeadershipSec.scrollIntoView({ behavior: 'smooth' }), 500);
+      businessLeadershipSec.classList.add('animate-flash-focus');
     }
   </script>
 </BaseLayout>

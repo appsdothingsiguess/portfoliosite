@@ -6,6 +6,7 @@ import { z, defineCollection } from 'astro:content';
 
 // 1. Journalism Collection
 // Supports: Articles, Instagram Reels, Videos
+// Note: Journalism articles don't need modes - they're content pieces shown in all modes
 const journalism = defineCollection({
   type: 'content',
   schema: z.object({
@@ -32,6 +33,7 @@ const research = defineCollection({
     posterUrl: z.string().optional(), // Path to PDF in /public/assets/pdfs/
     methodology: z.string().optional(), // For the accordion expansion
     findings: z.array(z.string()).optional(), // Bullet points for findings
+    modes: z.array(z.enum(['research', 'aba', 'business', 'journalism'])).default(['research']),
   })
 });
 
@@ -50,6 +52,7 @@ const leadership = defineCollection({
     })).optional(),
     tags: z.array(z.string()).optional(), // e.g., ["Finances", "Payroll"]
     summary: z.string(),
+    modes: z.array(z.enum(['research', 'aba', 'business', 'journalism'])).default(['business']),
   })
 });
 
@@ -68,11 +71,13 @@ const business = defineCollection({
     })).optional(),
     tags: z.array(z.string()).optional(), // e.g., ["E-Commerce", "P&L Management"]
     summary: z.string(),
+    modes: z.array(z.enum(['research', 'aba', 'business', 'journalism'])).default(['business']),
   })
 });
 
 // 5. Skills Collection
 // Supports: Technical Skills, Tools, Certifications
+// Note: Category is now derived from which experience files reference this skill
 const skills = defineCollection({
   type: 'content',
   schema: z.object({
@@ -82,8 +87,8 @@ const skills = defineCollection({
     level: z.enum(['Beginner', 'Intermediate', 'Advanced', 'Certified']),
     since: z.number(),
     order: z.number().optional(), // For manual sorting
-    category: z.enum(['research', 'business', 'journalism', 'technical']),
     featured: z.boolean().default(false), // Determines if skill appears in "Top Skills" section
+    modes: z.array(z.enum(['research', 'aba', 'business', 'journalism'])).optional(), // Optional: if not set, derived from experience files
   }),
 });
 

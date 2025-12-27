@@ -5,7 +5,6 @@ shortDesc: "Associated Press style guide proficiency"
 level: "Advanced"
 since: 2021
 order: 7
-category: "journalism"
 featured: false
 ---
 

@@ -5,7 +5,6 @@ shortDesc: "Experimental psychology software programming"
 level: "Advanced"
 since: 2024
 order: 2
-category: "research"
 featured: true
 ---
 

@@ -5,7 +5,6 @@ shortDesc: "Institutional Review Board protocol management"
 level: "Advanced"
 since: 2023
 order: 4
-category: "research"
 featured: true
 ---
 

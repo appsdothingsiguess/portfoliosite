@@ -5,7 +5,6 @@ shortDesc: "Meticulous attention to protocol fidelity and documentation"
 level: "Advanced"
 since: 2024
 order: 2
-category: "research"
 featured: true
 ---
 
