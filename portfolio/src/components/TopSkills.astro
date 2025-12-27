@@ -11,20 +11,17 @@ const { currentMode = 'research' } = Astro.props;
 // 1. Fetch all skills
 const allSkills = await getCollection('skills');
 
-// 2. Filter skills by modes field (if set) or fall back to relational logic
-let relevantSkills: typeof allSkills;
-
-// First, get skills with explicit modes that match current mode
-const skillsWithMatchingModes = allSkills.filter((skill) => {
-  if (skill.data.modes && skill.data.modes.length > 0) {
-    return skill.data.modes.includes(currentMode);
-  }
-  return false;
+// 2. Get ALL skills with explicit modes (render all, filter client-side for reactivity)
+// This allows client-side mode switching without re-rendering
+const skillsWithModes = allSkills.filter((skill) => {
+  return skill.data.modes && skill.data.modes.length > 0;
 });
 
-// Get skills without explicit modes (will use relational logic)
+// Get skills without explicit modes (will use relational logic for initial render only)
 const skillsWithoutModes = allSkills.filter(skill => !skill.data.modes || skill.data.modes.length === 0);
 
+// For skills without modes, use relational matching for the initial currentMode
+let relationallyMatched: typeof allSkills = [];
 if (skillsWithoutModes.length > 0) {
     // Determine context and fetch experience documents for relational matching
     let experienceDocs: Array<CollectionEntry<'research'>> | Array<CollectionEntry<'leadership'>> | Array<CollectionEntry<'business'>> | Array<CollectionEntry<'journalism'>> = [];
@@ -32,7 +29,6 @@ if (skillsWithoutModes.length > 0) {
     if (currentMode === 'research' || currentMode === 'aba') {
       experienceDocs = await getCollection('research');
     } else if (currentMode === 'business') {
-      // Business mode shows skills from both leadership and business experience
       const leadershipDocs = await getCollection('leadership');
       const businessDocs = await getCollection('business');
       experienceDocs = [...leadershipDocs, ...businessDocs] as Array<CollectionEntry<'leadership'>>;
@@ -40,75 +36,47 @@ if (skillsWithoutModes.length > 0) {
       experienceDocs = await getCollection('journalism');
     }
 
-    // Extract used skill IDs from experience documents
     const usedSkillIds = new Set<string>();
-
     experienceDocs.forEach((doc) => {
       if (currentMode === 'research' || currentMode === 'aba') {
-        // Research uses 'tools' array
         const researchDoc = doc as CollectionEntry<'research'>;
         researchDoc.data.tools?.forEach((tool) => {
-          // Add exact match (in case tool is already a slug like "spss-analysis")
           usedSkillIds.add(tool);
-          // Normalize tool name to match skill slug (lowercase, hyphenated)
           const normalized = tool.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
           usedSkillIds.add(normalized);
         });
       } else if (currentMode === 'business') {
-        // Leadership and Business both use 'tags' array
-        // Check if it's a leadership or business doc
         if ('organization' in doc.data && 'tags' in doc.data) {
           const tags = doc.data.tags;
           tags?.forEach((tag) => {
-            // Add exact match
             usedSkillIds.add(tag);
-            // Normalize tag name to match skill slug
             const normalized = tag.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
             usedSkillIds.add(normalized);
           });
         }
-      } else if (currentMode === 'journalism') {
-        // Journalism doesn't have tools/tags in current schema
-        // If needed in future, add logic here
       }
     });
 
-    // Filter skills without modes using relational logic
-    const relationallyMatched = skillsWithoutModes.filter((skill) => {
-      const skillId = skill.id; // e.g., "spss-analysis"
-      
-      // Check for exact match
+    relationallyMatched = skillsWithoutModes.filter((skill) => {
+      const skillId = skill.id;
       if (usedSkillIds.has(skillId)) return true;
-      
-      // Check for partial matches (e.g., "spss" matches "spss-analysis")
       for (const usedId of usedSkillIds) {
-        // If tool is "spss" and skill is "spss-analysis", match
-        if (skillId.includes(usedId) || usedId.includes(skillId)) {
-          return true;
-        }
-        // Also check if skill name (normalized) matches
+        if (skillId.includes(usedId) || usedId.includes(skillId)) return true;
         const normalizedSkillName = skill.data.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-        if (normalizedSkillName.includes(usedId) || usedId.includes(normalizedSkillName)) {
-          return true;
-        }
+        if (normalizedSkillName.includes(usedId) || usedId.includes(normalizedSkillName)) return true;
       }
-      
       return false;
     });
-    
-    // Combine skills with explicit modes and relationally matched skills
-    relevantSkills = [...skillsWithMatchingModes, ...relationallyMatched];
-} else {
-  // No skills without modes, so only use skills with explicit modes
-  relevantSkills = skillsWithMatchingModes;
 }
 
-// 5. Sort: featured skills first, then by order
-const sortedSkills = relevantSkills.sort((a, b) => {
-  // Featured skills come first
+// 3. Combine all skills that should be rendered (all with modes + relationally matched for initial mode)
+// Client-side script will filter by mode
+const allRenderableSkills = [...skillsWithModes, ...relationallyMatched];
+
+// 4. Sort: featured skills first, then by order
+const sortedSkills = allRenderableSkills.sort((a, b) => {
   if (a.data.featured && !b.data.featured) return -1;
   if (!a.data.featured && b.data.featured) return 1;
-  // Then by order
   return (a.data.order || 999) - (b.data.order || 999);
 });
 
@@ -137,10 +105,15 @@ const sortedSkills = relevantSkills.sort((a, b) => {
       </div>
     ) : (
       sortedSkills.map((skill) => {
+        // Determine which modes this skill should appear in
+        const skillModes = skill.data.modes || [];
+        // Create a data attribute with all modes this skill belongs to
+        const modesAttr = skillModes.join(',');
         return (
           <div 
             class="card p-6 hover:scale-[1.02] transition-all duration-200 top-skill-card"
             data-order={skill.data.order || 999}
+            data-modes={modesAttr}
           >
             <div class="flex items-start gap-4">
               <div class="flex-shrink-0 bg-surface-2 p-3 rounded-xl border border-border">
@@ -181,3 +154,96 @@ const sortedSkills = relevantSkills.sort((a, b) => {
     )}
   </div>
 </section>
+
+<script is:inline>
+  // Client-side mode switching for Top Skills
+  (function() {
+    function updateTopSkillsForMode(mode) {
+      const grid = document.getElementById('top-skills-grid');
+      const section = document.getElementById('top-skills');
+      const description = section?.querySelector('p.text-muted');
+      
+      if (!grid || !section) return;
+      
+      const cards = grid.querySelectorAll('.top-skill-card');
+      let visibleCount = 0;
+      
+      // Update description
+      if (description) {
+        const modeLabel = mode === 'aba' ? 'ABA/Research' : mode;
+        description.textContent = 'Core competencies for ' + modeLabel + ' roles.';
+      }
+      
+      // Show/hide cards based on modes attribute
+      cards.forEach(function(card) {
+        const modesAttr = card.getAttribute('data-modes');
+        if (modesAttr && modesAttr.trim()) {
+          const skillModes = modesAttr.split(',').map(m => m.trim()).filter(m => m);
+          const shouldShow = skillModes.includes(mode);
+          
+          if (shouldShow) {
+            card.style.display = '';
+            visibleCount++;
+          } else {
+            card.style.display = 'none';
+          }
+        } else {
+          // Skills without modes attribute are relationally matched - hide them on mode change
+          // They should only show for the initial mode they were matched for
+          card.style.display = 'none';
+        }
+      });
+      
+      // Show/hide empty state message
+      const emptyState = grid.querySelector('.md\\:col-span-3.card.text-center');
+      if (emptyState) {
+        if (visibleCount === 0) {
+          emptyState.style.display = '';
+          // Update empty state message
+          const emptyText = emptyState.querySelector('p.text-muted');
+          if (emptyText) {
+            emptyText.textContent = 'No skills found for ' + mode + ' mode.';
+          }
+        } else {
+          emptyState.style.display = 'none';
+        }
+      }
+    }
+    
+    // Listen for mode changes from parent
+    function initTopSkills() {
+      const container = document.getElementById('top-skills-container');
+      if (container) {
+        // Listen for modechange events
+        container.addEventListener('modechange', function(e) {
+          updateTopSkillsForMode(e.detail.mode);
+        });
+        
+        // Initial update based on data-mode attribute
+        const initialMode = container.getAttribute('data-mode') || 'aba';
+        // Set initial visibility - skills matching current mode are visible, others hidden
+        const grid = document.getElementById('top-skills-grid');
+        if (grid) {
+          const cards = grid.querySelectorAll('.top-skill-card');
+          cards.forEach(function(card) {
+            const modesAttr = card.getAttribute('data-modes');
+            if (modesAttr && modesAttr.trim()) {
+              const skillModes = modesAttr.split(',').map(m => m.trim()).filter(m => m);
+              if (!skillModes.includes(initialMode)) {
+                card.style.display = 'none';
+              }
+            }
+          });
+        }
+        updateTopSkillsForMode(initialMode);
+      }
+    }
+    
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initTopSkills);
+    } else {
+      initTopSkills();
+    }
+  })();
+</script>
