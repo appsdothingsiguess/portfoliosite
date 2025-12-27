@@ -2,7 +2,7 @@
 // This error does NOT affect Astro project builds if packages are properly installed. 
 // To resolve for dev: run `npm install astro@latest` in your project root OR add a `tsconfig.json` with "types": ["astro/client"].
 
-import { defineCollection, z } from 'astro:content';
+import { z, defineCollection } from 'astro:content';
 
 // 1. Journalism Collection
 // Supports: Articles, Instagram Reels, Videos
@@ -71,5 +71,19 @@ const business = defineCollection({
   })
 });
 
+// 5. Skills Collection
+// Supports: Technical Skills, Tools, Certifications
+const skills = defineCollection({
+  type: 'content',
+  schema: z.object({
+    name: z.string(),
+    icon: z.string(),
+    shortDesc: z.string(),
+    level: z.enum(['Beginner', 'Intermediate', 'Advanced', 'Certified']),
+    since: z.number(),
+    order: z.number().optional(), // For manual sorting
+  }),
+});
+
 // Export the collections to be registered by Astro
-export const collections = { journalism, research, leadership, business };
+export const collections = { journalism, research, leadership, business, skills };

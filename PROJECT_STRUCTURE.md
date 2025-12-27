@@ -22,56 +22,46 @@ Work Portfolio/
 │   │
 │   ├── src/                      # ✅ PRIMARY SOURCE DIRECTORY (Active)
 │   │   ├── content/              # Content collections (Astro Content Collections)
-│   │   │   ├── config.ts         # Collection schemas (journalism, research, leadership)
+│   │   │   ├── config.ts         # Collection schemas (journalism, research, leadership, business)
 │   │   │   ├── journalism/       # Journalism work samples
-│   │   │   │   └── Example.md
+│   │   │   │   ├── biola_sex_update.md
+│   │   │   │   ├── Closure of Dwelling.md
+│   │   │   │   ├── Dwelling_Investgation.md
+│   │   │   │   ├── instagram-example.md
+│   │   │   │   ├── SGA_Senate_recap.md
+│   │   │   │   └── Visa_revoked copy 2.md
 │   │   │   ├── research/         # Research projects & posters
 │   │   │   │   └── wpa25.md
-│   │   │   └── leadership/       # Business & leadership roles
+│   │   │   ├── leadership/       # Leadership roles
+│   │   │   │   └── thechimes.md
+│   │   │   └── Business/         # Business ventures
 │   │   │       └── spezzllc.md
 │   │   │
 │   │   ├── layouts/              # Astro layout components
 │   │   │   └── BaseLayout.astro  # Base page layout wrapper
 │   │   │
 │   │   ├── pages/                # Astro pages (file-based routing)
-│   │   │   └── index.astro       # Homepage/landing page
+│   │   │   └── index.astro       # Homepage/landing page (446 lines - refactoring planned)
 │   │   │
 │   │   ├── styles/               # Global stylesheets
-│   │   │   └── global.css        # CSS custom properties, Tailwind directives
+│   │   │   └── global.css        # CSS custom properties, Tailwind directives (156 lines)
 │   │   │
 │   │   └── env.d.ts              # TypeScript environment definitions
-│   │
-│   ├── content/                  # ⚠️ LEGACY (Duplicate - may be deprecated)
-│   │   ├── config.ts
-│   │   ├── Business/
-│   │   │   └── spezzllc.md
-│   │   ├── Journalism/
-│   │   │   └── Example.md
-│   │   └── Research/
-│   │       └── wpa25.md
-│   │
-│   ├── layouts/                  # ⚠️ LEGACY (Duplicate - may be deprecated)
-│   │   └── BaseLayout.astro
-│   │
-│   ├── pages/                    # ⚠️ LEGACY (Duplicate - may be deprecated)
-│   │   └── index.astro
-│   │
-│   ├── styles/                   # ⚠️ LEGACY (Duplicate - may be deprecated)
-│   │   └── global.css
 │   │
 │   └── node_modules/             # Dependencies (gitignored)
 │
 ├── .cursor/                       # 🤖 Cursor IDE Configuration
-│   └── rules/                    # Workspace rules & guidelines
-│       ├── architecture.mdc      # Architecture patterns
-│       ├── branding-guide.mdc    # Design system rules
-│       ├── branding.mdc          # Brand guidelines
-│       ├── coding-standards.mdc  # Code style & conventions
-│       ├── debug.mdc             # Debugging practices
-│       ├── defensive-programming.mdc  # Safety patterns
-│       ├── logging.mdc           # Logging standards
-│       ├── project-structure.mdc # Project structure (legacy - for different project)
-│       └── server-access.mdc     # Server deployment procedures
+│   ├── rules/                    # Workspace rules & guidelines
+│   │   ├── architecture.mdc      # Architecture patterns
+│   │   ├── branding-guide.mdc    # Design system rules
+│   │   ├── branding.mdc          # Brand guidelines
+│   │   ├── coding-standards.mdc  # Code style & conventions
+│   │   ├── debug.mdc             # Debugging practices
+│   │   ├── defensive-programming.mdc  # Safety patterns
+│   │   ├── logging.mdc           # Logging standards
+│   │   ├── project-structure.mdc # Project structure & tech stack constraints
+│   │   └── server-access.mdc     # Server deployment procedures
+│   └── refactoring-analysis.md   # 📋 Refactoring plan & component breakdown
 │
 └── features.mdc                   # Feature documentation
 ```
@@ -92,20 +82,42 @@ This is the main working directory where all active development occurs. Astro au
 - **Collections:**
   - `journalism/` - Articles, social media content, videos
   - `research/` - Research projects, posters, abstracts
-  - `leadership/` - Business ventures, management roles
+  - `leadership/` - Leadership roles and positions
+  - `Business/` - Business ventures and operations
+
+#### `/portfolio/src/components/` 🆕
+- **Purpose:** Reusable Astro components (planned refactoring)
+- **Status:** Directory to be created during refactoring
+- **Components:**
+  - `Navigation.astro` - Site navigation bar (~20 lines)
+  - `Hero.astro` - Hero section with dynamic content (~70 lines)
+  - `TechnicalSkills.astro` - Technical skills display (~15 lines)
+  - `ResearchSection.astro` - Research projects section (~80 lines)
+  - `LeadershipSection.astro` - Operations & leadership section (~60 lines)
+  - `JournalismSection.astro` - Journalism & media section (~75 lines)
+  - `ContactSection.astro` - Contact and footer section (~20 lines)
+  - `PosterModal.astro` - Research poster modal dialog (~20 lines)
+
+#### `/portfolio/src/scripts/` 🆕
+- **Purpose:** Client-side JavaScript files (planned refactoring)
+- **Status:** Directory to be created during refactoring
+- **Files:**
+  - `sticky-chameleon.js` - Dynamic hero content script (~65 lines)
 
 #### `/portfolio/src/layouts/`
 - **Purpose:** Reusable page layout components
-- **Files:** `BaseLayout.astro` - Wraps pages with common HTML structure, meta tags, navigation
+- **Files:** `BaseLayout.astro` (51 lines) - Wraps pages with common HTML structure, meta tags, navigation
 
 #### `/portfolio/src/pages/`
 - **Purpose:** File-based routing (Astro convention)
-- **Files:** `index.astro` - Homepage route (`/`)
+- **Files:** `index.astro` (446 lines) - Homepage route (`/`)
+  - **Status:** ⚠️ Close to 500-line limit, refactoring planned
+  - **Plan:** Extract sections into components, reduce to ~80 lines
 - **Note:** Each `.astro` file in this directory becomes a route
 
 #### `/portfolio/src/styles/`
 - **Purpose:** Global CSS styles
-- **Files:** `global.css` - CSS custom properties (design tokens), Tailwind directives
+- **Files:** `global.css` (156 lines) - CSS custom properties (design tokens), Tailwind directives
 
 ---
 
@@ -114,16 +126,6 @@ This is the main working directory where all active development occurs. Astro au
 - **Files:** `branding-guide-professional.html` - Design system reference (color tokens, typography, components)
 
 ---
-
-### `/portfolio/content/`, `/portfolio/layouts/`, `/portfolio/pages/`, `/portfolio/styles/`
-**Status:** ⚠️ Legacy/Duplicate directories
-
-These appear to be duplicate directories at the portfolio root level. The active structure is in `/portfolio/src/`. These may be:
-- Legacy files from before migration to `src/` structure
-- Backup files
-- Files that should be removed or consolidated
-
-**Recommendation:** Verify which files are actually used and consolidate to `/portfolio/src/` structure.
 
 ---
 
@@ -208,6 +210,19 @@ These appear to be duplicate directories at the portfolio root level. The active
 }
 ```
 
+### Business Collection
+```typescript
+{
+  organization: string
+  role: string
+  dateStart: Date
+  dateEnd?: Date
+  metrics?: Array<{ value: string, label: string }>
+  tags?: string[]
+  summary: string
+}
+```
+
 ---
 
 ## Build Output
@@ -252,12 +267,38 @@ When running `npm run build`, Astro generates:
 
 ---
 
-## Notes & Warnings
+## Code Organization & Refactoring
 
-⚠️ **Duplicate Directories:** The portfolio root contains duplicate directories (`content/`, `layouts/`, `pages/`, `styles/`) that mirror `/portfolio/src/`. The active structure is in `/portfolio/src/`. Consider cleaning up legacy files.
+### File Size Standards
+- **Maximum file size:** 500 lines
+- **Current status:**
+  - `index.astro`: 446 lines ⚠️ (close to limit, refactoring planned)
+  - `global.css`: 156 lines ✅
+  - `BaseLayout.astro`: 51 lines ✅
+  - `config.ts`: 74 lines ✅
+
+### Planned Refactoring
+The `index.astro` file will be refactored into smaller, reusable components:
+
+**Phase 1 (High Priority):**
+- Extract `Navigation.astro`, `ContactSection.astro`, `PosterModal.astro`, `TechnicalSkills.astro`
+
+**Phase 2 (Medium Priority):**
+- Extract `ResearchSection.astro`, `LeadershipSection.astro`, `JournalismSection.astro`
+
+**Phase 3 (Lower Priority):**
+- Extract `Hero.astro`, `sticky-chameleon.js`
+
+**Result:** `index.astro` reduced from 446 → ~80 lines
+
+See `.cursor/refactoring-analysis.md` for detailed breakdown.
+
+## Notes & Warnings
 
 ✅ **Active Structure:** All development should occur in `/portfolio/src/` directory.
 
 📝 **Content Collections:** Use the schemas defined in `/portfolio/src/content/config.ts` when creating new content files.
+
+🔄 **Refactoring:** Components directory (`/portfolio/src/components/`) and scripts directory (`/portfolio/src/scripts/`) will be created during the planned refactoring to improve code organization and maintainability.
 
 

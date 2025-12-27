@@ -1,0 +1,192 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  skills: Array<CollectionEntry<'skills'>>;
+}
+
+const { skills } = Astro.props;
+
+// Render all skills content upfront
+const renderedSkills = await Promise.all(
+  skills.map(async (skill) => {
+    const { Content } = await skill.render();
+    return {
+      ...skill,
+      Content,
+    };
+  })
+);
+
+// Helper function to get level badge colors
+function getLevelColors(level: string) {
+  switch (level) {
+    case 'Beginner':
+      return 'bg-gray-100 text-gray-600 border-gray-200';
+    case 'Intermediate':
+      return 'bg-blue-100 text-blue-600 border-blue-200';
+    case 'Advanced':
+      return 'bg-green-100 text-green-600 border-green-200';
+    case 'Certified':
+      return 'bg-yellow-100 text-yellow-700 border-yellow-200';
+    default:
+      return 'bg-gray-100 text-gray-600 border-gray-200';
+  }
+}
+---
+
+<div class="space-y-4">
+  <!-- Quick View Toggle -->
+  <div class="flex justify-end mb-4">
+    <button
+      id="toggle-all-skills"
+      class="btn-secondary px-4 py-2 text-sm inline-flex items-center gap-2 transition-all"
+      aria-label="Expand or collapse all skill details"
+    >
+      <i data-lucide="chevrons-down" class="w-4 h-4"></i>
+      <span id="toggle-all-text">Expand All</span>
+    </button>
+  </div>
+
+  {renderedSkills.map((skill, index) => {
+    const skillId = `skill-${index}`;
+    const levelColors = getLevelColors(skill.data.level);
+    
+    return (
+      <div class="card p-1 transition-all duration-300 hover:scale-[1.01]">
+        <details 
+          class="group open:bg-surface-2/30 rounded-xl transition-colors skill-details"
+          id={skillId}
+        >
+          <summary 
+            id={`${skillId}-summary`}
+            class="p-6 md:p-8 flex flex-col md:flex-row gap-6 cursor-pointer relative list-none focus-visible:outline focus-visible:outline-3 focus-visible:outline-[var(--focus)] focus-visible:outline-offset-2 focus-visible:rounded-xl"
+            tabindex="0"
+            role="button"
+            aria-expanded="false"
+            aria-controls={`${skillId}-content`}
+          >
+            <div class="flex-grow">
+              <div class="flex flex-wrap items-center gap-3 mb-2">
+                <i data-lucide={skill.data.icon} class="w-6 h-6 text-[var(--text)] flex-shrink-0" aria-hidden="true"></i>
+                <h3 class="text-xl font-serif font-bold group-hover:text-info transition-colors">{skill.data.name}</h3>
+              </div>
+              <p class="text-sm text-muted mb-4 leading-relaxed line-clamp-2">
+                {skill.data.shortDesc}
+              </p>
+              <div class="flex items-center gap-2 text-sm font-semibold text-info">
+                <i data-lucide="chevron-down" class="w-4 h-4 group-open:rotate-180 transition-transform duration-200" aria-hidden="true"></i>
+                <span class="group-open:hidden">View details</span>
+                <span class="hidden group-open:inline">Hide details</span>
+              </div>
+            </div>
+          </summary>
+          <div 
+            id={`${skillId}-content`}
+            class="px-6 pb-6 md:px-8 md:pb-8 pt-0 border-t border-border mt-2"
+            role="region"
+            aria-labelledby={`${skillId}-summary`}
+          >
+            <div class="pt-6">
+              <div class="text-sm text-[var(--text)] leading-relaxed mb-6 prose prose-sm max-w-none">
+                <skill.Content />
+              </div>
+              <div class="flex flex-wrap gap-3">
+                <span class={`pill ${levelColors}`}>
+                  <i data-lucide="bar-chart-3" class="w-3 h-3" aria-hidden="true"></i>
+                  <span>{skill.data.level}</span>
+                </span>
+                <span class="pill bg-blue-50 text-blue-800 border-blue-200">
+                  <i data-lucide="calendar" class="w-3 h-3" aria-hidden="true"></i>
+                  <span>Since {skill.data.since}</span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </details>
+      </div>
+    );
+  })}
+</div>
+
+<script is:inline>
+  // Expand All / Collapse All functionality
+  (function() {
+    // Wait for DOM and Lucide to be ready
+    function initToggle() {
+      const toggleButton = document.getElementById('toggle-all-skills');
+      const toggleText = document.getElementById('toggle-all-text');
+      const allDetails = document.querySelectorAll('.skill-details');
+      
+      if (!toggleButton || !toggleText || allDetails.length === 0) return;
+      
+      // Initialize aria-expanded based on current state
+      allDetails.forEach((details) => {
+        const summary = details.querySelector('summary');
+        if (summary) {
+          summary.setAttribute('aria-expanded', details.open ? 'true' : 'false');
+        }
+      });
+      
+      let allExpanded = Array.from(allDetails).every(d => d.open);
+      updateToggleButton(allExpanded);
+      
+      toggleButton.addEventListener('click', () => {
+        allExpanded = !allExpanded;
+        
+        allDetails.forEach((details) => {
+          const summary = details.querySelector('summary');
+          if (summary) {
+            if (allExpanded) {
+              details.setAttribute('open', '');
+              summary.setAttribute('aria-expanded', 'true');
+            } else {
+              details.removeAttribute('open');
+              summary.setAttribute('aria-expanded', 'false');
+            }
+          }
+        });
+        
+        updateToggleButton(allExpanded);
+      });
+      
+      function updateToggleButton(expanded) {
+        toggleText.textContent = expanded ? 'Collapse All' : 'Expand All';
+        
+        // Update icon
+        const icon = toggleButton.querySelector('i[data-lucide]');
+        if (icon && typeof lucide !== 'undefined') {
+          icon.setAttribute('data-lucide', expanded ? 'chevrons-up' : 'chevrons-down');
+          lucide.createIcons();
+        }
+      }
+      
+      // Update aria-expanded on individual toggles
+      allDetails.forEach((details) => {
+        const summary = details.querySelector('summary');
+        if (summary) {
+          details.addEventListener('toggle', () => {
+            summary.setAttribute('aria-expanded', details.open ? 'true' : 'false');
+            // Update toggle button state if all are expanded/collapsed
+            const allExpandedNow = Array.from(allDetails).every(d => d.open);
+            const allCollapsedNow = Array.from(allDetails).every(d => !d.open);
+            if (allExpandedNow || allCollapsedNow) {
+              allExpanded = allExpandedNow;
+              updateToggleButton(allExpanded);
+            }
+          });
+        }
+      });
+    }
+    
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(initToggle, 100); // Wait for Lucide to initialize
+      });
+    } else {
+      setTimeout(initToggle, 100);
+    }
+  })();
+</script>
+

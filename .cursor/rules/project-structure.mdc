@@ -1,5 +1,5 @@
 ---
-description: Project structure and core technology constraints for Joey's Shop
+description: Project structure and core technology constraints for Portfolio Website
 globs: 
 alwaysApply: true
 priority: 1
@@ -7,43 +7,81 @@ priority: 1
 # Project Structure & Tech Stack
 
 ## Core Philosophy
-- **Architecture:** Hybrid JAMstack.
-  - **Frontend:** Pre-built Static Files (Vite -> `dist/`).
-  - **Backend:** Node.js Express Service (for Admin/Uploads) + Supabase (DB/Auth).
-- **Theme:** "Kawaii Pixel Art" (16-bit aesthetic).
+- **Architecture:** Static Site Generator (SSG)
+  - **Framework:** Astro 5.16.6
+  - **Styling:** Tailwind CSS 3.4.0
+  - **Content:** Markdown-based Content Collections
+- **Theme:** Professional portfolio (employer-facing)
 
 ## Directory Layout
+
+```
+portfolio/
+├── src/                      # ✅ PRIMARY SOURCE DIRECTORY
+│   ├── content/              # Content Collections (Astro Content Collections)
+│   │   ├── config.ts         # Collection schemas (journalism, research, leadership, business)
+│   │   ├── journalism/       # Journalism work samples
+│   │   ├── research/         # Research projects & posters
+│   │   ├── leadership/       # Leadership roles
+│   │   └── Business/         # Business ventures
+│   │
+│   ├── components/           # 🆕 Reusable Astro components (Planned)
+│   │   ├── Navigation.astro          # Site navigation bar
+│   │   ├── Hero.astro                # Hero section with dynamic content
+│   │   ├── TechnicalSkills.astro     # Technical skills section
+│   │   ├── ResearchSection.astro     # Research projects display
+│   │   ├── LeadershipSection.astro   # Operations & leadership display
+│   │   ├── JournalismSection.astro   # Journalism & media display
+│   │   ├── ContactSection.astro      # Contact & footer section
+│   │   └── PosterModal.astro         # Research poster modal dialog
+│   │
+│   ├── scripts/              # 🆕 Client-side JavaScript (Planned)
+│   │   └── sticky-chameleon.js       # Dynamic hero content script
+│   │
+│   ├── layouts/              # Astro layout components
+│   │   └── BaseLayout.astro  # Base page layout wrapper
+│   │
+│   ├── pages/                # Astro pages (file-based routing)
+│   │   └── index.astro       # Homepage/landing page
+│   │
+│   ├── styles/               # Global stylesheets
+│   │   └── global.css        # CSS custom properties, Tailwind directives
+│   │
+│   └── env.d.ts              # TypeScript environment definitions
 │
-├── index.html              # 🌍 PORTAL: Landing page ("Crossroads").
-│
-├── shop/                   # 🛍️ THE APP SOURCE (Development)
-│   ├── package.json        # 📦 Dependencies (Vite, etc.)
-│   ├── vite.config.js      # ⚙️ Build Configuration
-│   │
-│   ├── index.html          # 🔐 LOGIN Entry Point
-│   ├── market.html         # 🏪 SHOP Entry Point
-│   ├── admin.html          # 🛠️ ADMIN Entry Point
-│   │
-│   ├── js/                 # ⚙️ LOGIC (ES Modules)
-│   │   ├── main.js         # Entry point importing CSS & App
-│   │   ├── app.js          # Alpine.js logic
-│   │   └── supabase.js     # Supabase Config
-│   │
-│   ├── assets/             # 🎨 RAW ASSETS
-│   │   ├── css/style.css
-│   │   ├── sprites/
-│   │   └── audio/
-│   │
-│   └── backend/            # 🔌 BACKEND API (Excluded from Vite)
-│       ├── server.js
-│       └── ecosystem.config.js
-│
-└── shop/dist/              # 🚀 PRODUCTION BUILD (Do not edit manually)
-    ├── index.html
-    └── assets/             # Hashed assets (index.a4b3.js, style.9c2d.css)
+├── astro.config.mjs          # Astro configuration
+├── tailwind.config.mjs       # Tailwind CSS theme & design tokens
+├── postcss.config.mjs        # PostCSS configuration
+└── package.json              # Dependencies & npm scripts
+```
 
 ## Tech Constraints
 ✅ **REQUIRED**
-- **Vite:** MUST be used for local dev (`npm run dev`) and production builds (`npm run build`).
-- **Alpine.js:** Used for UI state. Must be compatible with ES Modules (attach globals to `window`).
-- **Tailwind CSS:** (If used) must be processed via PostCSS/Vite.
+- **Astro:** MUST be used for all pages and routing
+- **TypeScript:** Used for any logic
+- **Tailwind CSS:** Used for layout and spacing (processed via PostCSS/Vite)
+- **CSS Variables (Design Tokens):** Used for color and typography
+- **Content Collections:** Content must come from Markdown/MDX collections, not hardcoded JSX
+
+❌ **DO NOT USE**
+- Client-side state managers
+- Animation libraries
+- UI frameworks (MUI, Chakra, etc.)
+- CMS backends
+- Authentication (static site only)
+
+## File Size Standards
+- **Maximum file size:** 500 lines
+- **Current status:**
+  - `index.astro`: 446 lines ⚠️ (close to limit, refactoring planned)
+  - `global.css`: 156 lines ✅
+  - `BaseLayout.astro`: 51 lines ✅
+  - `config.ts`: 74 lines ✅
+
+## Content Collections
+- **Journalism:** Articles, social media content, videos
+- **Research:** Research projects, posters, abstracts
+- **Leadership:** Leadership roles and positions
+- **Business:** Business ventures and operations
+
+All collections use Zod schemas defined in `src/content/config.ts`.

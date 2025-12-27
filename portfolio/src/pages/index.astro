@@ -1,17 +1,22 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
+import TechnicalSkills from '../components/TechnicalSkills.astro';
 
 // 1. Fetch Data from Content Collections
 const researchDocs = await getCollection('research');
 const leadershipDocs = await getCollection('leadership');
 const journalismDocs = await getCollection('journalism');
+const skillsDocs = await getCollection('skills');
 
 // 2. Sort Data (Newest first)
 // Ensure fallback to empty array to prevent build errors if folder is empty
 const sortedResearch = (researchDocs || []).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 const sortedJournalism = (journalismDocs || []).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 const sortedLeadership = (leadershipDocs || []).sort((a, b) => b.data.dateStart.valueOf() - a.data.dateStart.valueOf());
+const sortedSkills = (skillsDocs || []).sort((a, b) => 
+  (a.data.order || 999) - (b.data.order || 999)
+);
 ---
 
 <BaseLayout title="Joseph Abboud | Researcher & Operator">
@@ -102,18 +107,18 @@ const sortedLeadership = (leadershipDocs || []).sort((a, b) => b.data.dateStart.
   <main class="max-w-5xl mx-auto px-6 space-y-20 py-16">
 
     <!-- Section: Technical Skills -->
-    <section>
-      <h3 class="text-sm font-bold uppercase tracking-wider text-muted mb-4">Technical Toolkit & Certifications</h3>
-      <div class="flex flex-wrap gap-2">
-        <span class="pill shadow-sm">SPSS Analysis</span>
-        <span class="pill shadow-sm">E-Prime Design</span>
-        <span class="pill shadow-sm">RBT / ABA Principles</span>
-        <span class="pill shadow-sm">IRB Compliance</span>
-        <span class="pill shadow-sm">Qualtrics</span>
-        <span class="pill shadow-sm">Project Management (Asana)</span>
-        <span class="pill shadow-sm">AP Style Writing</span>
-        <span class="pill shadow-sm">Budget P&L</span>
+    <section id="skills" class="scroll-mt-24 transition-colors duration-1000 p-4 -m-4 rounded-2xl">
+      <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+        <div>
+          <h2 class="text-3xl font-serif font-bold mb-2 flex items-center gap-2">
+            <i data-lucide="wrench" class="w-6 h-6 text-muted"></i>
+            Technical Toolkit & Certifications
+          </h2>
+          <p class="text-muted max-w-lg">Software proficiency, research tools, and professional certifications.</p>
+        </div>
       </div>
+
+      <TechnicalSkills skills={sortedSkills} />
     </section>
 
     <!-- Section: Research (Uses <details> natively) -->
