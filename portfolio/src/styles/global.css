@@ -62,42 +62,32 @@
     display: none; 
   }
   
+  /* Prevent links in summary from toggling details */
+  details.journalism-card summary a {
+    pointer-events: auto;
+  }
+  
   /* Accordion animation */
   details[open] summary ~ * { 
     animation: sweep 0.2s ease-in-out; 
   }
   
-  /* Journalism card styles - each card is independent */
-  details.journalism-card {
+  /* Journalism card styles - handled by JavaScript */
+  .journalism-card {
     background-color: transparent;
   }
   
-  details.journalism-card[open] {
+  .journalism-card.is-open {
     background-color: rgba(240, 242, 248, 0.3);
   }
   
-  details.journalism-card[open] .journalism-title a {
+  .journalism-card.is-open .journalism-title a {
     color: var(--info);
   }
   
-  details.journalism-card[open] .journalism-chevron {
-    transform: rotate(180deg);
-  }
-  
-  details.journalism-card[open] .journalism-toggle-text-more {
-    display: none;
-  }
-  
-  details.journalism-card[open] .journalism-toggle-text-less {
-    display: inline;
-  }
-  
-  details.journalism-card:not([open]) .journalism-toggle-text-more {
-    display: inline;
-  }
-  
-  details.journalism-card:not([open]) .journalism-toggle-text-less {
-    display: none;
+  /* Ensure content animates when opening */
+  .journalism-card.is-open .journalism-content {
+    animation: sweep 0.2s ease-in-out;
   }
   
   @keyframes sweep {

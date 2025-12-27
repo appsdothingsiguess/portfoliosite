@@ -36,19 +36,19 @@ const research = defineCollection({
 });
 
 // 3. Leadership & Operations Collection
-// Supports: Business Ventures, Management Roles
+// Supports: Management Roles, Team Leadership
 const leadership = defineCollection({
   type: 'content',
   schema: z.object({
-    organization: z.string(), // e.g., "Spezz LLC"
-    role: z.string(), // e.g., "Founder"
+    organization: z.string(), // e.g., "The Chimes"
+    role: z.string(), // e.g., "Business Manager"
     dateStart: z.date(),
     dateEnd: z.date().optional(), // If empty, UI displays "Present"
     metrics: z.array(z.object({
-      value: z.string(), // "$500k+"
-      label: z.string(), // "Revenue"
+      value: z.string(), // "35%"
+      label: z.string(), // "Reduced Costs"
     })).optional(),
-    tags: z.array(z.string()).optional(), // e.g., ["E-Commerce", "P&L"]
+    tags: z.array(z.string()).optional(), // e.g., ["Finances", "Payroll"]
     summary: z.string(),
   })
 });
@@ -59,14 +59,14 @@ const business = defineCollection({
   type: 'content',
   schema: z.object({
     organization: z.string(), // e.g., "Spezz LLC"
-    role: z.string(), // e.g., "Founder"
+    role: z.string(), // e.g., "Founder & Operator"
     dateStart: z.date(),
     dateEnd: z.date().optional(), // If empty, UI displays "Present"
     metrics: z.array(z.object({
       value: z.string(), // "$500k+"
-      label: z.string(), // "Revenue"
+      label: z.string(), // "Gross Revenue"
     })).optional(),
-    tags: z.array(z.string()).optional(), // e.g., ["E-Commerce", "P&L"]
+    tags: z.array(z.string()).optional(), // e.g., ["E-Commerce", "P&L Management"]
     summary: z.string(),
   })
 });
