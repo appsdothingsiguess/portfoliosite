@@ -92,5 +92,17 @@ const skills = defineCollection({
   }),
 });
 
+// 6. Modes Collection
+// Supports: Hero content for each portfolio mode (research, aba, business, journalism)
+const modes = defineCollection({
+  type: 'content',
+  schema: z.object({
+    badgeText: z.string(), // e.g., "Specializing in Experimental Design & Data"
+    badgeColor: z.string(), // e.g., "bg-blue-500"
+    title: z.string(), // Can contain HTML like <br class="hidden md:block"/>
+    description: z.string(),
+  })
+});
+
 // Export the collections to be registered by Astro
-export const collections = { journalism, research, leadership, business, skills };
+export const collections = { journalism, research, leadership, business, skills, modes };

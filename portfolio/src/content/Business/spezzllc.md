@@ -1,6 +1,6 @@
 ---
 organization: "Spezz LLC"
-role: "Founder & Operator"
+role: "Founder & CEO"
 dateStart: 2020-05-30
 dateEnd: 2025-05-01
 metrics:

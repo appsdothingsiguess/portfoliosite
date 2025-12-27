@@ -20,20 +20,12 @@ const leadershipDocs = await getCollection('leadership');
 const businessDocs = await getCollection('business');
 const journalismDocs = await getCollection('journalism');
 const skillsDocs = await getCollection('skills');
+const modesDocs = await getCollection('modes');
 
-// 2. Filter experiences by modes field
-// If no explicit mode param, show all experiences (default aba mode shows everything)
-// If explicit mode param, filter by that mode
-const filteredResearch = hasExplicitMode 
-  ? (researchDocs || []).filter(doc => doc.data.modes.includes(currentMode))
-  : (researchDocs || []);
-const filteredLeadership = hasExplicitMode
-  ? (leadershipDocs || []).filter(doc => doc.data.modes.includes(currentMode))
-  : (leadershipDocs || []);
-const filteredBusiness = hasExplicitMode
-  ? (businessDocs || []).filter(doc => doc.data.modes.includes(currentMode))
-  : (businessDocs || []);
-// Journalism articles don't need mode filtering - they're content pieces shown in all modes
+// 2. Always show all experiences (URL params only reorder, not filter)
+const filteredResearch = researchDocs || [];
+const filteredLeadership = leadershipDocs || [];
+const filteredBusiness = businessDocs || [];
 const filteredJournalism = journalismDocs || [];
 
 // 3. Sort Data (Newest first)
@@ -45,46 +37,33 @@ const sortedSkills = (skillsDocs || []).sort((a, b) =>
   (a.data.order || 999) - (b.data.order || 999)
 );
 
-// 4. Hero content based on mode
-const heroContent = {
-  research: {
-    badge: { color: 'bg-blue-500', text: 'Specializing in Experimental Design & Data' },
-    title: 'Data-Driven Researcher & <br class="hidden md:block"/> Psychology Graduate.',
-    description: 'Leveraging E-Prime and SPSS to analyze behavioral patterns. Proven track record in protocol fidelity and participant management.'
-  },
-  aba: {
-    badge: { color: 'bg-green-500', text: 'Targeting RBT & Behavior Tech Roles' },
-    title: 'Behavior Technician & <br class="hidden md:block"/> Clinical Support.',
-    description: 'Implementing behavior intervention plans with fidelity. Experienced in data collection, pairing, and supporting clinical supervisors.'
-  },
-  business: {
-    badge: { color: 'bg-orange-500', text: 'Scaling Operations & Efficiency' },
-    title: 'Operations Leader & <br class="hidden md:block"/> Business Founder.',
-    description: 'From 0 to 1. I build systems, optimize budgets, and lead teams to execute complex projects under deadline.'
-  },
-  journalism: {
-    badge: { color: 'bg-purple-500', text: 'Available for Editorial & Media Roles' },
-    title: 'Investigative Journalist & <br class="hidden md:block"/> Media Manager.',
-    description: 'Asking the hard questions and verifying the facts. Experience managing newsrooms, editing copy, and producing multimedia content.'
-  }
+// 4. Hero content based on mode (loaded from modes collection)
+const heroContent = Object.fromEntries(
+  modesDocs.map(doc => [doc.id, {
+    badge: { color: doc.data.badgeColor, text: doc.data.badgeText },
+    title: doc.data.title,
+    description: doc.data.description
+  }])
+);
+
+// Fallback hero content if mode file is missing
+const defaultHero = {
+  badge: { color: 'bg-green-500', text: 'Portfolio' },
+  title: 'Professional Portfolio',
+  description: 'Welcome to my portfolio.'
 };
 
-const currentHero = heroContent[currentMode];
+const currentHero = heroContent[currentMode] || defaultHero;
 
-// 5. Determine section order based on mode
+// 5. Determine section order based on mode (always ends with skills and contact)
 function getSectionOrder(mode: typeof currentMode): string[] {
-  switch (mode) {
-    case 'research':
-      return ['research', 'business-leadership', 'journalism'];
-    case 'business':
-      return ['business-leadership', 'journalism', 'research'];
-    case 'aba':
-      return ['research', 'business-leadership', 'journalism'];
-    case 'journalism':
-      return ['journalism', 'research', 'business-leadership'];
-    default:
-      return ['research', 'business-leadership', 'journalism'];
-  }
+  const baseOrder = {
+    research: ['research', 'business-leadership', 'journalism'],
+    business: ['business-leadership', 'journalism', 'research'],
+    aba: ['research', 'business-leadership', 'journalism'],
+    journalism: ['journalism', 'research', 'business-leadership']
+  };
+  return [...baseOrder[mode], 'skills', 'contact'];
 }
 
 const sectionOrder = getSectionOrder(currentMode);
@@ -184,6 +163,7 @@ const sectionOrder = getSectionOrder(currentMode);
       [data-section-order="1"] { order: 1; }
       [data-section-order="2"] { order: 2; }
       [data-section-order="3"] { order: 3; }
+      [data-section-order="4"] { order: 4; }
     </style>
 
     <!-- Section: Top Skills (Featured Skills) -->
@@ -430,8 +410,8 @@ const sectionOrder = getSectionOrder(currentMode);
       </div>
     </section>
 
-    {/* Technical Skills Section - Always at the end */}
-    <section id="skills" data-section-order="3" class="scroll-mt-24 transition-colors duration-1000 p-4 -m-4 rounded-2xl">
+    {/* Technical Skills Section */}
+    <section id="skills" data-section-order={sectionOrder.indexOf('skills')} class="scroll-mt-24 transition-colors duration-1000 p-4 -m-4 rounded-2xl">
       <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
         <div>
           <h2 class="text-3xl font-serif font-bold mb-2 flex items-center gap-2">
@@ -446,7 +426,7 @@ const sectionOrder = getSectionOrder(currentMode);
     </section>
 
     <!-- Contact -->
-    <section id="contact" class="mt-32 mb-10">
+    <section id="contact" data-section-order={sectionOrder.indexOf('contact')} class="scroll-mt-24 transition-colors duration-1000 p-4 -m-4 rounded-2xl">
       <div class="bg-surface border border-border rounded-2xl p-10 md:p-16 text-center">
         <h2 class="text-3xl md:text-4xl font-bold mb-6">Let's Connect.</h2>
         <p class="text-muted max-w-xl mx-auto mb-8 text-lg">
