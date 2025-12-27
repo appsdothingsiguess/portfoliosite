@@ -9,20 +9,43 @@ const { title } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Joseph Abboud - Behavioral Science Researcher & Operational Leader" />
     <title>{title}</title>
+    
+    <!-- Typography: Newsreader (Headings) + Inter (Body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,700;1,6..72,400&display=swap" rel="stylesheet">
   </head>
-  <body>
+  <body class="antialiased selection:bg-[#FFD670] selection:text-[#2A1F00]">
     <slot />
     
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script>
-      lucide.createIcons();
+    <script is:inline>
+      // Initialize Lucide icons after DOM loads
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+          if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+          }
+        });
+      } else {
+        if (typeof lucide !== 'undefined') {
+          lucide.createIcons();
+        }
+      }
+      
+      // Re-initialize icons after dynamic content loads (for Astro islands)
+      setTimeout(() => {
+        if (typeof lucide !== 'undefined') {
+          lucide.createIcons();
+        }
+      }, 100);
     </script>
   </body>
 </html>

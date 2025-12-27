@@ -8,17 +8,25 @@ export default {
           DEFAULT: 'var(--brand)',
           ink: 'var(--brand-ink)',
         },
+        bg: 'var(--bg)',
         surface: {
           DEFAULT: 'var(--surface)',
           2: 'var(--surface-2)',
         },
+        text: {
+          DEFAULT: 'var(--text)',
+          muted: 'var(--muted)',
+        },
         border: 'var(--border)',
         muted: 'var(--muted)',
         info: 'var(--info)',
+        success: 'var(--success)',
+        warning: 'var(--warning)',
+        danger: 'var(--danger)',
       },
       fontFamily: {
         serif: ['Newsreader', 'Georgia', 'serif'],
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
       },
       animation: {
         'sweep': 'sweep 0.2s ease-in-out',
