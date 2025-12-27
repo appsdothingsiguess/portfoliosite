@@ -219,12 +219,61 @@ Sections are reordered based on the current mode:
 4. For research: Add skill slugs to `tools` array
 5. For leadership/business: Add skill slugs to `tags` array (optional)
 
-### Editing Hero Content
+### Editing Hero Content (Title, Badge, Description)
 
-1. Navigate to `src/content/modes/`
-2. Edit the markdown file for the mode you want to change (e.g., `research.md`)
-3. Update `badgeText`, `badgeColor`, `title`, or `description`
-4. Save the file - changes will appear on the next build
+The hero section content (title, badge text, badge color, and description) is stored in markdown files for easy editing. Each mode has its own file.
+
+#### Step-by-Step Guide
+
+1. **Navigate to the modes directory**: `src/content/modes/`
+
+2. **Open the mode file you want to edit**:
+   - `research.md` - For Research mode (`?r`)
+   - `aba.md` - For ABA mode (`?a`, default)
+   - `business.md` - For Business mode (`?b`)
+   - `journalism.md` - For Journalism mode (`?j`)
+
+3. **Edit the frontmatter fields**:
+   ```yaml
+   ---
+   badgeText: "Your badge text here"  # Text shown in the small badge above title
+   badgeColor: "bg-blue-500"          # Tailwind CSS color class (e.g., bg-blue-500, bg-green-500, bg-orange-500, bg-purple-500)
+   title: "Your Title Here"            # Main hero title (can include HTML like <br> tags)
+   description: "Your description here" # Subtitle/description text below the title
+   ---
+   ```
+
+4. **Save the file** - Changes will appear automatically in dev mode, or after rebuilding
+
+#### Field Details
+
+- **`badgeText`**: Short text displayed in the small badge above the title (e.g., "Specializing in Experimental Design & Data")
+- **`badgeColor`**: Tailwind CSS color class for the badge dot. Common options:
+  - `bg-blue-500` - Blue (Research)
+  - `bg-green-500` - Green (ABA)
+  - `bg-orange-500` - Orange (Business)
+  - `bg-purple-500` - Purple (Journalism)
+- **`title`**: Main hero title. Can include HTML for responsive formatting:
+  - Use `<br class="hidden md:block"/>` to add line breaks that only show on desktop
+  - Example: `"Data-Driven Researcher & <br class="hidden md:block"/> Psychology Graduate."`
+- **`description`**: Paragraph text below the title describing your role/focus
+
+#### Example: Changing Research Mode Title
+
+1. Open `src/content/modes/research.md`
+2. Change the `title` field:
+   ```yaml
+   title: "Your New Title Here"
+   ```
+3. Save the file
+4. Visit `/?r` to see the changes
+
+#### Tips
+
+- Use HTML in titles sparingly - only for responsive line breaks
+- Keep badge text short (under 50 characters recommended)
+- Description should be 1-2 sentences, max 200 characters
+- Badge colors should match the mode's theme for consistency
 
 ### Adding a New Skill
 

@@ -6,6 +6,7 @@ level: "Advanced"
 since: 2023
 order: 1
 featured: true
+modes: ["research", "aba"]
 ---
 
 Experience with regression models, ANOVA, chi-square tests, and data visualization. Used across 3 research projects including WPA 2025 poster presentation. Proficient in syntax writing and automated reporting.

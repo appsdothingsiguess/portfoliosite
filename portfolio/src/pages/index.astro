@@ -7,20 +7,32 @@ import TopSkills from '../components/TopSkills.astro';
 // Determine current mode from URL params (server-side)
 const url = Astro.url;
 const params = url.searchParams;
+// #region agent log
+fetch('http://127.0.0.1:7244/ingest/a7ca4eda-4f6b-42fd-97e8-abf86a8386d5',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.astro:8',message:'URL params check',data:{url:url.toString(),searchParams:url.search,hasR:params.has('r'),hasB:params.has('b'),hasA:params.has('a'),hasJ:params.has('j'),allParams:Object.fromEntries(params)},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'I'})}).catch(()=>{});
+// #endregion
 let currentMode: 'research' | 'business' | 'journalism' | 'aba' = 'aba';
 const hasExplicitMode = params.has('r') || params.has('b') || params.has('a') || params.has('j');
 if (params.has('r')) currentMode = 'research';
 if (params.has('b')) currentMode = 'business';
 if (params.has('a')) currentMode = 'aba';
 if (params.has('j')) currentMode = 'journalism';
+// #region agent log
+fetch('http://127.0.0.1:7244/ingest/a7ca4eda-4f6b-42fd-97e8-abf86a8386d5',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.astro:16',message:'Mode determined',data:{currentMode,hasExplicitMode},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'I'})}).catch(()=>{});
+// #endregion
 
 // 1. Fetch Data from Content Collections
+// #region agent log
+fetch('http://127.0.0.1:7244/ingest/a7ca4eda-4f6b-42fd-97e8-abf86a8386d5',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.astro:18',message:'Fetching collections',data:{currentMode},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+// #endregion
 const researchDocs = await getCollection('research');
 const leadershipDocs = await getCollection('leadership');
 const businessDocs = await getCollection('business');
 const journalismDocs = await getCollection('journalism');
 const skillsDocs = await getCollection('skills');
 const modesDocs = await getCollection('modes');
+// #region agent log
+fetch('http://127.0.0.1:7244/ingest/a7ca4eda-4f6b-42fd-97e8-abf86a8386d5',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.astro:24',message:'Collections loaded',data:{modesDocsCount:modesDocs?.length||0,researchCount:researchDocs?.length||0,journalismCount:journalismDocs?.length||0,modesDocIds:modesDocs?.map(d=>d.id)||[]},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+// #endregion
 
 // 2. Always show all experiences (URL params only reorder, not filter)
 const filteredResearch = researchDocs || [];
@@ -29,22 +41,66 @@ const filteredBusiness = businessDocs || [];
 const filteredJournalism = journalismDocs || [];
 
 // 3. Sort Data (Newest first)
-const sortedResearch = filteredResearch.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
-const sortedJournalism = filteredJournalism.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+// #region agent log
+fetch('http://127.0.0.1:7244/ingest/a7ca4eda-4f6b-42fd-97e8-abf86a8386d5',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.astro:32',message:'Before sorting',data:{researchCount:filteredResearch.length,journalismCount:filteredJournalism.length,researchFirstDate:filteredResearch[0]?.data?.date,researchDateType:typeof filteredResearch[0]?.data?.date,journalismFirstDate:filteredJournalism[0]?.data?.date,journalismDateType:typeof filteredJournalism[0]?.data?.date},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'})}).catch(()=>{});
+// #endregion
+const sortedResearch = filteredResearch.sort((a, b) => {
+  const aVal = a.data.date.valueOf();
+  const bVal = b.data.date.valueOf();
+  // #region agent log
+  fetch('http://127.0.0.1:7244/ingest/a7ca4eda-4f6b-42fd-97e8-abf86a8386d5',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.astro:33',message:'Research sort comparison',data:{aVal,bVal,result:bVal-aVal,aDate:a.data.date,bDate:b.data.date},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'G'})}).catch(()=>{});
+  // #endregion
+  return bVal - aVal;
+});
+const sortedJournalism = filteredJournalism.sort((a, b) => {
+  const aVal = a.data.date.valueOf();
+  const bVal = b.data.date.valueOf();
+  // #region agent log
+  fetch('http://127.0.0.1:7244/ingest/a7ca4eda-4f6b-42fd-97e8-abf86a8386d5',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.astro:36',message:'Journalism sort comparison',data:{aVal,bVal,result:bVal-aVal,aDate:a.data.date,bDate:b.data.date},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'G'})}).catch(()=>{});
+  // #endregion
+  return bVal - aVal;
+});
 const sortedLeadership = filteredLeadership.sort((a, b) => b.data.dateStart.valueOf() - a.data.dateStart.valueOf());
 const sortedBusiness = filteredBusiness.sort((a, b) => b.data.dateStart.valueOf() - a.data.dateStart.valueOf());
+// #region agent log
+fetch('http://127.0.0.1:7244/ingest/a7ca4eda-4f6b-42fd-97e8-abf86a8386d5',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.astro:40',message:'After sorting',data:{sortedResearchFirst:sortedResearch[0]?.data?.title,sortedJournalismFirst:sortedJournalism[0]?.data?.title,sortedResearchDates:sortedResearch.map(r=>r.data.date),sortedJournalismDates:sortedJournalism.map(j=>j.data.date)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H'})}).catch(()=>{});
+// #endregion
 const sortedSkills = (skillsDocs || []).sort((a, b) => 
   (a.data.order || 999) - (b.data.order || 999)
 );
 
 // 4. Hero content based on mode (loaded from modes collection)
-const heroContent = Object.fromEntries(
-  modesDocs.map(doc => [doc.id, {
-    badge: { color: doc.data.badgeColor, text: doc.data.badgeText },
-    title: doc.data.title,
-    description: doc.data.description
-  }])
-);
+const heroContent: Record<string, { badge: { color: string; text: string }; title: string; description: string }> = {};
+
+// Build hero content from modes collection
+// #region agent log
+fetch('http://127.0.0.1:7244/ingest/a7ca4eda-4f6b-42fd-97e8-abf86a8386d5',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.astro:44',message:'Before building heroContent',data:{modesDocsLength:modesDocs?.length||0,currentMode},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'B'})}).catch(()=>{});
+// #endregion
+if (modesDocs && modesDocs.length > 0) {
+  for (const doc of modesDocs) {
+    // #region agent log
+    fetch('http://127.0.0.1:7244/ingest/a7ca4eda-4f6b-42fd-97e8-abf86a8386d5',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.astro:47',message:'Processing mode doc',data:{docId:doc?.id,hasData:!!doc?.data,hasBadgeColor:!!doc?.data?.badgeColor,hasBadgeText:!!doc?.data?.badgeText,hasTitle:!!doc?.data?.title,hasDescription:!!doc?.data?.description},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'C'})}).catch(()=>{});
+    // #endregion
+    if (doc && doc.data && doc.id) {
+      // Strip .md extension from doc.id to match currentMode (e.g., "aba.md" -> "aba")
+      const modeKey = doc.id.replace(/\.md$/, '');
+      heroContent[modeKey] = {
+        badge: { 
+          color: doc.data.badgeColor || 'bg-green-500', 
+          text: doc.data.badgeText || 'Portfolio' 
+        },
+        title: doc.data.title || 'Professional Portfolio',
+        description: doc.data.description || 'Welcome to my portfolio.'
+      };
+      // #region agent log
+      fetch('http://127.0.0.1:7244/ingest/a7ca4eda-4f6b-42fd-97e8-abf86a8386d5',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.astro:57',message:'Added to heroContent',data:{docId:doc.id,modeKey,heroContentKeys:Object.keys(heroContent)},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'C'})}).catch(()=>{});
+      // #endregion
+    }
+  }
+}
+// #region agent log
+fetch('http://127.0.0.1:7244/ingest/a7ca4eda-4f6b-42fd-97e8-abf86a8386d5',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.astro:59',message:'After building heroContent',data:{heroContentKeys:Object.keys(heroContent),currentMode,hasCurrentModeKey:currentMode in heroContent},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'D'})}).catch(()=>{});
+// #endregion
 
 // Fallback hero content if mode file is missing
 const defaultHero = {
@@ -53,15 +109,28 @@ const defaultHero = {
   description: 'Welcome to my portfolio.'
 };
 
+// Get hero content for current mode, with fallback
+// Debug: Log to verify collection is loading (remove in production)
+if (Object.keys(heroContent).length === 0) {
+  console.warn(`[Portfolio] No hero content loaded from modes collection. Modes docs count: ${modesDocs?.length || 0}`);
+}
+
 const currentHero = heroContent[currentMode] || defaultHero;
+// #region agent log
+fetch('http://127.0.0.1:7244/ingest/a7ca4eda-4f6b-42fd-97e8-abf86a8386d5',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.astro:74',message:'Selected currentHero',data:{currentMode,usingFallback:!(currentMode in heroContent),currentHeroTitle:currentHero.title,currentHeroDescription:currentHero.description},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'E'})}).catch(()=>{});
+// #endregion
+
+// Embed all hero content for client-side mode switching (since static mode doesn't have query params)
+const allHeroContent = JSON.stringify(heroContent);
+const defaultHeroJson = JSON.stringify(defaultHero);
 
 // 5. Determine section order based on mode (always ends with skills and contact)
 function getSectionOrder(mode: typeof currentMode): string[] {
   const baseOrder = {
-    research: ['research', 'business-leadership', 'journalism'],
-    business: ['business-leadership', 'journalism', 'research'],
-    aba: ['research', 'business-leadership', 'journalism'],
-    journalism: ['journalism', 'research', 'business-leadership']
+    research: ['research', 'business', 'leadership', 'journalism'],
+    business: ['business', 'leadership', 'journalism', 'research'],
+    aba: ['research', 'business', 'leadership', 'journalism'],
+    journalism: ['journalism', 'research', 'business', 'leadership']
   };
   return [...baseOrder[mode], 'skills', 'contact'];
 }
@@ -77,7 +146,7 @@ const sectionOrder = getSectionOrder(currentMode);
       <a href="./" class="font-serif font-bold text-xl tracking-tight">Joseph Abboud</a>
       
       <div class="flex items-center gap-3">
-        <a href="#research" class="btn-secondary px-3 py-2 rounded-lg text-xs font-semibold inline-flex items-center gap-2">
+        <a href="?r" class="btn-secondary px-3 py-2 rounded-lg text-xs font-semibold inline-flex items-center gap-2">
           <i data-lucide="microscope" class="w-4 h-4"></i>
           <span class="hidden sm:inline">Research</span>
         </a>
@@ -95,14 +164,14 @@ const sectionOrder = getSectionOrder(currentMode);
       
       <!-- Dynamic Text Content -->
       <div class="flex-1 text-center md:text-left">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border bg-surface mb-6 shadow-sm">
-          <span class={`w-2 h-2 rounded-full ${currentHero.badge.color} animate-pulse`}></span>
-          <span class="text-xs font-medium text-muted">{currentHero.badge.text}</span>
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border bg-surface mb-6 shadow-sm" id="hero-badge">
+          <span class={`w-2 h-2 rounded-full ${currentHero.badge.color} animate-pulse`} id="hero-badge-dot"></span>
+          <span class="text-xs font-medium text-muted" id="hero-badge-text">{currentHero.badge.text}</span>
         </div>
         
-        <h1 class="text-4xl md:text-5xl lg:text-6xl font-serif font-bold leading-[1.1] mb-6 text-balance text-[var(--text)]" set:html={currentHero.title}></h1>
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-serif font-bold leading-[1.1] mb-6 text-balance text-[var(--text)]" id="hero-title" set:html={currentHero.title}></h1>
         
-        <p class="text-lg text-muted leading-relaxed max-w-xl mx-auto md:mx-0 mb-8">
+        <p class="text-lg text-muted leading-relaxed max-w-xl mx-auto md:mx-0 mb-8" id="hero-description">
           {currentHero.description}
         </p>
 
@@ -135,6 +204,9 @@ const sectionOrder = getSectionOrder(currentMode);
           <a href="/assets/pdfs/Resume.pdf" target="_blank" class="btn-secondary px-6 py-3 rounded-xl inline-flex items-center gap-2">
             <i data-lucide="file-text" class="w-4 h-4"></i> Download Resume
           </a>
+          <a href="#contact" class="btn-primary px-6 py-3 rounded-xl inline-flex items-center gap-2">
+            <i data-lucide="message-square" class="w-4 h-4"></i> Let's Connect
+          </a>
         </div>
       </div>
 
@@ -159,11 +231,19 @@ const sectionOrder = getSectionOrder(currentMode);
         flex-direction: column;
         gap: 2.5rem;
       }
+      /* Dynamic ordering: use CSS custom property for flexibility */
+      [data-section-order] {
+        order: attr(data-section-order number);
+      }
+      /* Fallback for browsers that don't support attr() in order */
       [data-section-order="0"] { order: 0; }
       [data-section-order="1"] { order: 1; }
       [data-section-order="2"] { order: 2; }
       [data-section-order="3"] { order: 3; }
       [data-section-order="4"] { order: 4; }
+      [data-section-order="5"] { order: 5; }
+      [data-section-order="998"] { order: 998; }
+      [data-section-order="999"] { order: 999; }
     </style>
 
     <!-- Section: Top Skills (Featured Skills) -->
@@ -258,21 +338,20 @@ const sectionOrder = getSectionOrder(currentMode);
       </div>
     </section>
 
-    {/* Business & Leadership Section */}
-    {(sortedBusiness.length > 0 || sortedLeadership.length > 0) && (
-      <section id="business-leadership" data-section-order={sectionOrder.indexOf('business-leadership')} class="scroll-mt-24 transition-colors duration-1000 p-4 -m-4 rounded-2xl">
+    {/* Business Section */}
+    {sortedBusiness.length > 0 && (
+      <section id="business" data-section-order={sectionOrder.indexOf('business')} class="scroll-mt-24 transition-colors duration-1000 p-4 -m-4 rounded-2xl">
         <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
           <div>
             <h2 class="text-3xl font-serif font-bold mb-2 flex items-center gap-2">
               <i data-lucide="briefcase" class="w-6 h-6 text-muted"></i>
-              Business & Leadership
+              Business Ventures
             </h2>
-            <p class="text-muted max-w-lg">E-commerce operations, business development, and team management.</p>
+            <p class="text-muted max-w-lg">E-commerce operations and business development.</p>
           </div>
         </div>
 
         <div class="grid md:grid-cols-2 gap-6">
-          {/* Business Ventures */}
           {sortedBusiness.map((item) => (
             <div class="card p-6 md:p-8">
               <div class="flex justify-between items-start mb-4">
@@ -303,9 +382,25 @@ const sectionOrder = getSectionOrder(currentMode);
               )}
             </div>
           ))}
-          
-          {/* Leadership Roles */}
-          {sortedLeadership.map((item) => (
+        </div>
+      </section>
+    )}
+
+    {/* Leadership Section */}
+    {sortedLeadership.filter(item => !item.data.modes?.includes('journalism')).length > 0 && (
+      <section id="leadership" data-section-order={sectionOrder.indexOf('leadership')} class="scroll-mt-24 transition-colors duration-1000 p-4 -m-4 rounded-2xl">
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+          <div>
+            <h2 class="text-3xl font-serif font-bold mb-2 flex items-center gap-2">
+              <i data-lucide="users" class="w-6 h-6 text-muted"></i>
+              Leadership & Operations
+            </h2>
+            <p class="text-muted max-w-lg">Team management and operational leadership.</p>
+          </div>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6">
+          {sortedLeadership.filter(item => !item.data.modes?.includes('journalism')).map((item) => (
             <div class="card p-6 md:p-8">
               <div class="flex justify-between items-start mb-4">
                 <div>
@@ -349,69 +444,178 @@ const sectionOrder = getSectionOrder(currentMode);
           </h2>
           <p class="text-muted max-w-lg">Investigative reporting and multimedia content.</p>
         </div>
-        
-        <div class="flex bg-surface border border-border rounded-full p-1">
-          <span class="px-4 py-1.5 rounded-full text-sm font-medium bg-[var(--text)] text-surface">All Content</span>
-        </div>
       </div>
 
-      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="journalism-grid">
-        {sortedJournalism.map((item, index) => (
-          <article class="card p-1 flex flex-col h-full">
-            <div class="p-6 flex flex-col h-full">
-              {/* Publication Badge + Year */}
-              <div class="flex justify-between items-center mb-3">
-                <span class={`pill ${item.data.type === 'Article' ? 'bg-blue-50 text-blue-800 border-blue-200' : 'bg-purple-50 text-purple-800 border-purple-200'}`}>
-                  {item.data.type === 'Article' ? (
-                    <>
-                      <i data-lucide="file-text" class="w-3 h-3"></i>
-                      <span>{item.data.publication || 'Article'}</span>
-                    </>
-                  ) : (
-                    <>
-                      <i data-lucide="instagram" class="w-3 h-3"></i>
-                      <span>{item.data.publication || 'Social'}</span>
-                    </>
-                  )}
-                </span>
-                <span class="text-xs text-muted font-medium">{item.data.date.getFullYear()}</span>
+      {/* Experience Cards - Leadership entries with journalism mode */}
+      {sortedLeadership.filter(item => item.data.modes?.includes('journalism')).length > 0 && (
+        <div class="mb-8 space-y-6">
+          {sortedLeadership.filter(item => item.data.modes?.includes('journalism')).map((item) => (
+            <div class="card p-6 md:p-8">
+              <div class="flex justify-between items-start mb-4">
+                <div>
+                  <h3 class="text-lg font-serif font-bold">{item.data.role}</h3>
+                  <div class="text-sm text-muted">{item.data.organization} • {item.data.dateStart.getFullYear()} - {item.data.dateEnd ? item.data.dateEnd.getFullYear() : 'Present'}</div>
+                </div>
+                {item.data.tags && item.data.tags.length > 0 && (
+                  <div class="flex flex-wrap gap-2">
+                    {item.data.tags.map((tag) => (
+                      <span class="pill">{tag}</span>
+                    ))}
+                  </div>
+                )}
               </div>
-              
-              {/* Title - Clickable */}
-              <h3 class="text-xl font-serif font-bold mb-3 leading-tight">
-                <a 
-                  href={item.data.url} 
-                  target="_blank" 
-                  class="hover:underline decoration-brand decoration-2 underline-offset-2 text-[var(--text)]"
-                >
-                  {item.data.title}
-                </a>
-              </h3>
-              
-              {/* Summary */}
-              <p class="text-muted text-sm mb-4 flex-grow leading-relaxed line-clamp-3">
+              <p class="text-sm text-muted leading-relaxed mb-4">
                 {item.data.summary}
               </p>
-              
-              {/* Actions Row */}
-              <div class="mt-auto pt-4 flex items-center border-t border-border">
-                <a 
-                  href={item.data.url} 
-                  target="_blank" 
-                  class="text-xs font-semibold flex items-center gap-1.5 hover:text-info transition-colors"
-                >
-                  {item.data.type === 'Article' ? 'Read Article' : 'View Post'} 
-                  <i data-lucide="external-link" class="w-3 h-3"></i>
-                </a>
-              </div>
+              {item.data.metrics && (
+                <div class="flex gap-4 border-t border-border pt-4">
+                  {item.data.metrics.map((m) => (
+                    <div>
+                      <div class="text-lg font-bold font-serif">{m.value}</div>
+                      <div class="text-xs text-muted uppercase">{m.label}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-          </article>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
+
+      {/* View My Work - Collapsible section with filterable articles/social media */}
+      <details class="group" open>
+        <summary class="cursor-pointer list-none mb-6">
+          <div class="flex items-center justify-between p-4 bg-surface border border-border rounded-xl hover:bg-surface-2 transition-colors">
+            <div class="flex items-center gap-3">
+              <i data-lucide="chevron-down" class="w-5 h-5 text-muted group-open:rotate-180 transition-transform"></i>
+              <h3 class="text-xl font-serif font-bold">View My Work</h3>
+            </div>
+            <div class="flex bg-surface border border-border rounded-full p-1" id="journalism-filter">
+              <button 
+                data-filter="all" 
+                class="journalism-filter-btn px-4 py-1.5 rounded-full text-sm font-medium bg-[var(--text)] text-surface transition-all"
+              >
+                All Content
+              </button>
+              <button 
+                data-filter="Article" 
+                class="journalism-filter-btn px-4 py-1.5 rounded-full text-sm font-medium text-muted hover:bg-surface-2 transition-all"
+              >
+                Articles
+              </button>
+              <button 
+                data-filter="Social" 
+                class="journalism-filter-btn px-4 py-1.5 rounded-full text-sm font-medium text-muted hover:bg-surface-2 transition-all"
+              >
+                Social Media
+              </button>
+            </div>
+          </div>
+        </summary>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="journalism-grid">
+          {sortedJournalism.map((item, index) => (
+            <article 
+              class="card p-1 flex flex-col h-full journalism-item" 
+              data-type={item.data.type}
+            >
+              <div class="p-6 flex flex-col h-full">
+                {/* Publication Badge + Year */}
+                <div class="flex justify-between items-center mb-3">
+                  <span class={`pill ${item.data.type === 'Article' ? 'bg-blue-50 text-blue-800 border-blue-200' : 'bg-purple-50 text-purple-800 border-purple-200'}`}>
+                    {item.data.type === 'Article' ? (
+                      <>
+                        <i data-lucide="file-text" class="w-3 h-3"></i>
+                        <span>{item.data.publication || 'Article'}</span>
+                      </>
+                    ) : (
+                      <>
+                        <i data-lucide="instagram" class="w-3 h-3"></i>
+                        <span>{item.data.publication || 'Social'}</span>
+                      </>
+                    )}
+                  </span>
+                  <span class="text-xs text-muted font-medium">{item.data.date.getFullYear()}</span>
+                </div>
+                
+                {/* Title - Clickable */}
+                <h3 class="text-xl font-serif font-bold mb-3 leading-tight">
+                  <a 
+                    href={item.data.url} 
+                    target="_blank" 
+                    class="hover:underline decoration-brand decoration-2 underline-offset-2 text-[var(--text)]"
+                  >
+                    {item.data.title}
+                  </a>
+                </h3>
+                
+                {/* Summary */}
+                <p class="text-muted text-sm mb-4 flex-grow leading-relaxed line-clamp-3">
+                  {item.data.summary}
+                </p>
+                
+                {/* Actions Row */}
+                <div class="mt-auto pt-4 flex items-center border-t border-border">
+                  <a 
+                    href={item.data.url} 
+                    target="_blank" 
+                    class="text-xs font-semibold flex items-center gap-1.5 hover:text-info transition-colors"
+                  >
+                    {item.data.type === 'Article' ? 'Read Article' : 'View Post'} 
+                    <i data-lucide="external-link" class="w-3 h-3"></i>
+                  </a>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      </details>
     </section>
 
-    {/* Technical Skills Section */}
-    <section id="skills" data-section-order={sectionOrder.indexOf('skills')} class="scroll-mt-24 transition-colors duration-1000 p-4 -m-4 rounded-2xl">
+    <script is:inline>
+      // Journalism filter functionality
+      (function() {
+        const filterButtons = document.querySelectorAll('.journalism-filter-btn');
+        const journalismItems = document.querySelectorAll('.journalism-item');
+        
+        function filterJournalism(type) {
+          journalismItems.forEach((item) => {
+            const itemType = item.getAttribute('data-type');
+            if (type === 'all' || itemType === type) {
+              item.style.display = '';
+            } else {
+              item.style.display = 'none';
+            }
+          });
+          
+          // Update button states
+          filterButtons.forEach((btn) => {
+            const filterType = btn.getAttribute('data-filter');
+            if (filterType === type) {
+              btn.className = 'journalism-filter-btn px-4 py-1.5 rounded-full text-sm font-medium bg-[var(--text)] text-surface transition-all';
+            } else {
+              btn.className = 'journalism-filter-btn px-4 py-1.5 rounded-full text-sm font-medium text-muted hover:bg-surface-2 transition-all';
+            }
+          });
+        }
+        
+        filterButtons.forEach((btn) => {
+          btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const filterType = btn.getAttribute('data-filter');
+            filterJournalism(filterType || 'all');
+          });
+        });
+        
+        // Re-initialize Lucide icons after filter buttons are set up
+        if (typeof lucide !== 'undefined') {
+          setTimeout(() => lucide.createIcons(), 100);
+        }
+      })();
+    </script>
+
+    {/* Technical Skills Section - Always second to last */}
+    <section id="skills" data-section-order="998" class="scroll-mt-24 transition-colors duration-1000 p-4 -m-4 rounded-2xl">
       <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
         <div>
           <h2 class="text-3xl font-serif font-bold mb-2 flex items-center gap-2">
@@ -425,8 +629,8 @@ const sectionOrder = getSectionOrder(currentMode);
       <TechnicalSkills skills={sortedSkills} />
     </section>
 
-    <!-- Contact -->
-    <section id="contact" data-section-order={sectionOrder.indexOf('contact')} class="scroll-mt-24 transition-colors duration-1000 p-4 -m-4 rounded-2xl">
+    <!-- Contact - Always last -->
+    <section id="contact" data-section-order="999" class="scroll-mt-24 transition-colors duration-1000 p-4 -m-4 rounded-2xl">
       <div class="bg-surface border border-border rounded-2xl p-10 md:p-16 text-center">
         <h2 class="text-3xl md:text-4xl font-bold mb-6">Let's Connect.</h2>
         <p class="text-muted max-w-xl mx-auto mb-8 text-lg">
@@ -562,23 +766,120 @@ const sectionOrder = getSectionOrder(currentMode);
     // #endregion
   </script>
 
+  <!-- Embed hero content data for client-side mode switching -->
+  <script is:inline define:vars={{allHeroContent, defaultHeroJson}}>
+    window.portfolioHeroContent = JSON.parse(allHeroContent);
+    window.portfolioDefaultHero = JSON.parse(defaultHeroJson);
+  </script>
+
   <!-- Sticky Chameleon Script -->
   <script is:inline>
     // 1. Check URL params
     const params = new URLSearchParams(window.location.search);
-    // Default to 'research' for Psychology/Research roles (T-Shaped profile)
-    let currentMode = localStorage.getItem('portfolioMode') || 'research';
+    // #region agent log
+    fetch('http://127.0.0.1:7244/ingest/a7ca4eda-4f6b-42fd-97e8-abf86a8386d5',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.astro:client-init',message:'Client script started',data:{url:window.location.href,search:window.location.search,hasR:params.has('r'),hasB:params.has('b'),hasA:params.has('a'),hasJ:params.has('j')},timestamp:Date.now(),sessionId:'debug-session',runId:'run4',hypothesisId:'A'})}).catch(()=>{});
+    // #endregion
+    
+    // Check localStorage for reference (but don't use it when no URL params)
+    const storedMode = localStorage.getItem('portfolioMode');
+    // #region agent log
+    fetch('http://127.0.0.1:7244/ingest/a7ca4eda-4f6b-42fd-97e8-abf86a8386d5',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.astro:localStorage-check',message:'LocalStorage check',data:{storedMode,hasStoredMode:!!storedMode},timestamp:Date.now(),sessionId:'debug-session',runId:'run5',hypothesisId:'B'})}).catch(()=>{});
+    // #endregion
+    
+    // Default to 'aba' (matches server-side default)
+    // IMPORTANT: When no URL params, always use default 'aba', ignore localStorage
+    const hasUrlParams = params.has('r') || params.has('b') || params.has('a') || params.has('j');
+    let currentMode = 'aba'; // Always start with default
+    
+    // #region agent log
+    fetch('http://127.0.0.1:7244/ingest/a7ca4eda-4f6b-42fd-97e8-abf86a8386d5',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.astro:mode-init',message:'Mode initialization',data:{hasUrlParams,initialMode:currentMode,storedMode,willIgnoreStorage:!hasUrlParams},timestamp:Date.now(),sessionId:'debug-session',runId:'run5',hypothesisId:'C'})}).catch(()=>{});
+    // #endregion
 
-    // 2. Set Mode (URL overrides storage)
+    // 2. Set Mode (URL params override default)
     if (params.has('r')) currentMode = 'research';
     if (params.has('b')) currentMode = 'business';
     if (params.has('a')) currentMode = 'aba';
     if (params.has('j')) currentMode = 'journalism';
+    
+    // #region agent log
+    fetch('http://127.0.0.1:7244/ingest/a7ca4eda-4f6b-42fd-97e8-abf86a8386d5',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.astro:mode-after-url',message:'Mode after URL params',data:{currentMode,hasUrlParams},timestamp:Date.now(),sessionId:'debug-session',runId:'run5',hypothesisId:'C'})}).catch(()=>{});
+    // #endregion
 
-    // 3. Save to Storage
-    if (currentMode) localStorage.setItem('portfolioMode', currentMode);
+    // 3. Save to Storage (only if URL params were used - this persists user's explicit choice)
+    if (hasUrlParams && currentMode) {
+      localStorage.setItem('portfolioMode', currentMode);
+      // #region agent log
+      fetch('http://127.0.0.1:7244/ingest/a7ca4eda-4f6b-42fd-97e8-abf86a8386d5',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.astro:save-to-storage',message:'Saving to localStorage',data:{currentMode,reason:'url-params-present'},timestamp:Date.now(),sessionId:'debug-session',runId:'run5',hypothesisId:'D'})}).catch(()=>{});
+      // #endregion
+    } else {
+      // #region agent log
+      fetch('http://127.0.0.1:7244/ingest/a7ca4eda-4f6b-42fd-97e8-abf86a8386d5',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.astro:not-saving-storage',message:'Not saving to localStorage',data:{currentMode,reason:'no-url-params-using-default'},timestamp:Date.now(),sessionId:'debug-session',runId:'run5',hypothesisId:'D'})}).catch(()=>{});
+      // #endregion
+    }
 
-    // 4. Update Top Skills mode (for client component reactivity)
+    // 4. Update Hero Content based on mode (client-side)
+    function updateHeroContent(mode) {
+      const heroContent = window.portfolioHeroContent || {};
+      const defaultHero = window.portfolioDefaultHero || {};
+      const hero = heroContent[mode] || defaultHero;
+      
+      // Update badge
+      const badgeDot = document.getElementById('hero-badge-dot');
+      const badgeText = document.getElementById('hero-badge-text');
+      if (badgeDot && hero.badge) {
+        badgeDot.className = `w-2 h-2 rounded-full ${hero.badge.color} animate-pulse`;
+      }
+      if (badgeText && hero.badge) {
+        badgeText.textContent = hero.badge.text;
+      }
+      
+      // Update title
+      const titleEl = document.getElementById('hero-title');
+      if (titleEl && hero.title) {
+        titleEl.innerHTML = hero.title;
+      }
+      
+      // Update description
+      const descEl = document.getElementById('hero-description');
+      if (descEl && hero.description) {
+        descEl.textContent = hero.description;
+      }
+      
+      // #region agent log
+      fetch('http://127.0.0.1:7244/ingest/a7ca4eda-4f6b-42fd-97e8-abf86a8386d5',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.astro:updateHeroContent',message:'Updated hero content',data:{mode,heroTitle:hero.title,heroBadge:hero.badge.text},timestamp:Date.now(),sessionId:'debug-session',runId:'run3',hypothesisId:'J'})}).catch(()=>{});
+      // #endregion
+    }
+
+    // 5. Update section ordering based on mode
+    function updateSectionOrder(mode) {
+      const sectionOrder = {
+        research: ['research', 'business', 'leadership', 'journalism'],
+        business: ['business', 'leadership', 'journalism', 'research'],
+        aba: ['research', 'business', 'leadership', 'journalism'],
+        journalism: ['journalism', 'research', 'business', 'leadership']
+      };
+      
+      const order = sectionOrder[mode] || sectionOrder['aba'];
+      const sections = ['research', 'business', 'leadership', 'journalism'];
+      
+      sections.forEach((sectionId, index) => {
+        const section = document.getElementById(sectionId);
+        if (section) {
+          const newIndex = order.indexOf(sectionId);
+          section.setAttribute('data-section-order', newIndex >= 0 ? newIndex : 999);
+        }
+      });
+      
+      // #region agent log
+      fetch('http://127.0.0.1:7244/ingest/a7ca4eda-4f6b-42fd-97e8-abf86a8386d5',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.astro:updateSectionOrder',message:'Updated section order',data:{mode,order},timestamp:Date.now(),sessionId:'debug-session',runId:'run3',hypothesisId:'J'})}).catch(()=>{});
+      // #endregion
+    }
+
+    // 6. Apply mode changes on page load
+    updateHeroContent(currentMode);
+    updateSectionOrder(currentMode);
+
+    // 7. Update Top Skills mode (for client component reactivity)
     const topSkillsContainer = document.getElementById('top-skills-container');
     if (topSkillsContainer) {
       topSkillsContainer.setAttribute('data-mode', currentMode);
@@ -586,25 +887,6 @@ const sectionOrder = getSectionOrder(currentMode);
       topSkillsContainer.dispatchEvent(new CustomEvent('modechange', { 
         detail: { mode: currentMode } 
       }));
-    }
-
-    // 5. Scroll to section if URL param is present (hero is now server-rendered)
-    const researchSec = document.getElementById('research');
-    const businessLeadershipSec = document.getElementById('business-leadership');
-    const journalismSec = document.getElementById('journalism');
-
-    if (params.has('r') && researchSec) {
-      setTimeout(() => researchSec.scrollIntoView({ behavior: 'smooth' }), 500);
-      researchSec.classList.add('animate-flash-focus');
-    } else if (params.has('a') && researchSec) {
-      setTimeout(() => researchSec.scrollIntoView({ behavior: 'smooth' }), 500);
-      researchSec.classList.add('animate-flash-focus');
-    } else if (params.has('j') && journalismSec) {
-      setTimeout(() => journalismSec.scrollIntoView({ behavior: 'smooth' }), 500);
-      journalismSec.classList.add('animate-flash-focus');
-    } else if (params.has('b') && businessLeadershipSec) {
-      setTimeout(() => businessLeadershipSec.scrollIntoView({ behavior: 'smooth' }), 500);
-      businessLeadershipSec.classList.add('animate-flash-focus');
     }
   </script>
 </BaseLayout>

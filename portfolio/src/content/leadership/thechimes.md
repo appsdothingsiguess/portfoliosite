@@ -11,5 +11,5 @@ metrics:
     label: "Quarterly Instagram Views"
 tags: ["Finances", "Payroll", "Advertising & Marketing"]
 summary: "Managed the financial, payroll, budgeting, advertising, and technology operations of The Chimes. Heavily assisted with the formation of The Chimes Media Group (a merger of three student media groups)."
-modes: ["business"]
+modes: ["journalism"]
 ---

@@ -14,24 +14,18 @@ const allSkills = await getCollection('skills');
 // 2. Filter skills by modes field (if set) or fall back to relational logic
 let relevantSkills: typeof allSkills;
 
-// Check if any skills have explicit modes set
-const skillsWithModes = allSkills.filter(skill => skill.data.modes && skill.data.modes.length > 0);
+// First, get skills with explicit modes that match current mode
+const skillsWithMatchingModes = allSkills.filter((skill) => {
+  if (skill.data.modes && skill.data.modes.length > 0) {
+    return skill.data.modes.includes(currentMode);
+  }
+  return false;
+});
 
-if (skillsWithModes.length > 0) {
-  // Filter by modes field if set
-  relevantSkills = allSkills.filter((skill) => {
-    // If skill has modes field set, check if current mode is in the array
-    if (skill.data.modes && skill.data.modes.length > 0) {
-      return skill.data.modes.includes(currentMode);
-    }
-    // If no modes field, fall back to relational logic
-    return true; // Will be filtered further below
-  });
-  
-  // For skills without explicit modes, use relational logic
-  const skillsWithoutModes = relevantSkills.filter(skill => !skill.data.modes || skill.data.modes.length === 0);
-  
-  if (skillsWithoutModes.length > 0) {
+// Get skills without explicit modes (will use relational logic)
+const skillsWithoutModes = allSkills.filter(skill => !skill.data.modes || skill.data.modes.length === 0);
+
+if (skillsWithoutModes.length > 0) {
     // Determine context and fetch experience documents for relational matching
     let experienceDocs: Array<CollectionEntry<'research'>> | Array<CollectionEntry<'leadership'>> | Array<CollectionEntry<'business'>> | Array<CollectionEntry<'journalism'>> = [];
 
@@ -103,79 +97,10 @@ if (skillsWithModes.length > 0) {
     });
     
     // Combine skills with explicit modes and relationally matched skills
-    const skillsWithExplicitModes = relevantSkills.filter(skill => skill.data.modes && skill.data.modes.length > 0);
-    relevantSkills = [...skillsWithExplicitModes, ...relationallyMatched];
-  }
+    relevantSkills = [...skillsWithMatchingModes, ...relationallyMatched];
 } else {
-  // No skills have explicit modes, use relational logic for all
-  let experienceDocs: Array<CollectionEntry<'research'>> | Array<CollectionEntry<'leadership'>> | Array<CollectionEntry<'business'>> | Array<CollectionEntry<'journalism'>> = [];
-
-  if (currentMode === 'research' || currentMode === 'aba') {
-    experienceDocs = await getCollection('research');
-  } else if (currentMode === 'business') {
-    // Business mode shows skills from both leadership and business experience
-    const leadershipDocs = await getCollection('leadership');
-    const businessDocs = await getCollection('business');
-    experienceDocs = [...leadershipDocs, ...businessDocs] as Array<CollectionEntry<'leadership'>>;
-  } else if (currentMode === 'journalism') {
-    experienceDocs = await getCollection('journalism');
-  }
-
-  // Extract used skill IDs from experience documents
-  const usedSkillIds = new Set<string>();
-
-  experienceDocs.forEach((doc) => {
-    if (currentMode === 'research' || currentMode === 'aba') {
-      // Research uses 'tools' array
-      const researchDoc = doc as CollectionEntry<'research'>;
-      researchDoc.data.tools?.forEach((tool) => {
-        // Add exact match (in case tool is already a slug like "spss-analysis")
-        usedSkillIds.add(tool);
-        // Normalize tool name to match skill slug (lowercase, hyphenated)
-        const normalized = tool.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-        usedSkillIds.add(normalized);
-      });
-    } else if (currentMode === 'business') {
-      // Leadership and Business both use 'tags' array
-      // Check if it's a leadership or business doc
-      if ('organization' in doc.data && 'tags' in doc.data) {
-        const tags = doc.data.tags;
-        tags?.forEach((tag) => {
-          // Add exact match
-          usedSkillIds.add(tag);
-          // Normalize tag name to match skill slug
-          const normalized = tag.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-          usedSkillIds.add(normalized);
-        });
-      }
-    } else if (currentMode === 'journalism') {
-      // Journalism doesn't have tools/tags in current schema
-      // If needed in future, add logic here
-    }
-  });
-
-  // Filter skills: Keep only if skill ID (slug) is in usedSkillIds
-  relevantSkills = allSkills.filter((skill) => {
-    const skillId = skill.id; // e.g., "spss-analysis"
-    
-    // Check for exact match
-    if (usedSkillIds.has(skillId)) return true;
-    
-    // Check for partial matches (e.g., "spss" matches "spss-analysis")
-    for (const usedId of usedSkillIds) {
-      // If tool is "spss" and skill is "spss-analysis", match
-      if (skillId.includes(usedId) || usedId.includes(skillId)) {
-        return true;
-      }
-      // Also check if skill name (normalized) matches
-      const normalizedSkillName = skill.data.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-      if (normalizedSkillName.includes(usedId) || usedId.includes(normalizedSkillName)) {
-        return true;
-      }
-    }
-    
-    return false;
-  });
+  // No skills without modes, so only use skills with explicit modes
+  relevantSkills = skillsWithMatchingModes;
 }
 
 // 5. Sort: featured skills first, then by order
