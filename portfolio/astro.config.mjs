@@ -18,6 +18,13 @@ export default defineConfig({
   vite: {
     build: {
       assetsInlineLimit: 0, // Ensures assets are handled correctly
+    },
+    // Improve content collection watching
+    server: {
+      watch: {
+        // Watch content directory for changes
+        ignored: ['!**/src/content/**']
+      }
     }
   }
 });

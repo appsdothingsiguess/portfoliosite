@@ -82,6 +82,8 @@ const skills = defineCollection({
     level: z.enum(['Beginner', 'Intermediate', 'Advanced', 'Certified']),
     since: z.number(),
     order: z.number().optional(), // For manual sorting
+    category: z.enum(['research', 'business', 'journalism', 'technical']),
+    featured: z.boolean().default(false), // Determines if skill appears in "Top Skills" section
   }),
 });
 
