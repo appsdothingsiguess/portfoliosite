@@ -1,91 +1,218 @@
 ---
 alwaysApply: true
-description: Pixel Art CSS rules, Alpine.js patterns, and Security globs:
+description: universal programming standards
+---
+````md
+---
+description: Coding Standards — Personal Portfolio Website
+alwaysApply: true
+priority: 1
 ---
 
-1. Visual Design System (Pixel Art)
+# Coding Standards
 
-CRITICAL CSS RULE:
-All images must use nearest-neighbor scaling to prevent blurring. This class is MANDATORY for all sprites.
+These rules are **authoritative**. Cursor must follow them unless explicitly instructed otherwise.
 
-/* Must be present in shop/assets/css/style.css */
-.pixel-art {
-    image-rendering: pixelated;       /* Chrome/Safari */
-    image-rendering: -moz-crisp-edges; /* Firefox */
-    image-rendering: crisp-edges;     /* Standard */
-}
+This project is a **static, employer-facing portfolio**, not an app, not a startup, not a playground.
 
+---
 
-UI Components:
+## 1. Core Engineering Philosophy
 
-Buttons: Chunky borders to simulate 3D depth (Light Top/Left, Dark Bottom/Right).
+- **Clarity > cleverness**
+- **Credibility > aesthetics**
+- **Content > components**
+- **HTML first, JavaScript last**
 
-Fonts: Use 'VT323' (Body) or 'Press Start 2P' (Headers).
+If a solution adds complexity without improving employer comprehension, it is wrong.
 
-Colors: - Background: Deep Indigo #2D1B4E
+---
 
-Primary: Bubblegum Pink #FF70A6
+## 2. Technology Constraints (Hard Rules)
 
-Gold: #FFD670
+- Use **Astro** for all pages and routing.
+- Use **TypeScript** for any logic.
+- Use **Tailwind CSS** for layout and spacing.
+- Use **CSS variables (design tokens)** for color and typography.
+- Content must come from **Markdown / MDX collections**, not hardcoded JSX.
 
-2. Alpine.js Best Practices
+❌ Do not introduce:
+- Client-side state managers
+- Animation libraries
+- UI frameworks (MUI, Chakra, etc.)
+- CMS backends
+- Authentication
 
-State Management:
-Do not bloat HTML with complex JS. Extract logic into js/app.js.
+---
 
-✅ GOOD:
+## 3. HTML & Accessibility Standards
 
-<div x-data="shopLogic()">
-    <button @click="buyItem(item)">Buy</button>
-</div>
+### Semantic Structure (Required)
 
-<!-- js/app.js -->
-function shopLogic() {
-    return {
-        items: [],
-        async buyItem(item) { ... }
-    }
-}
+- Every page must have:
+  - One `<main>`
+  - One `<h1>`
+  - Proper heading hierarchy (`h1 → h2 → h3`)
+- Navigation must be keyboard accessible.
+- A **skip-to-content link** must exist.
 
+### Focus & Interaction
 
-❌ BAD:
+- Never remove focus outlines.
+- Use `:focus-visible`, not `:focus`.
+- Focus must be visually obvious.
 
-<div x-data="{ items: [], buyItem(i) { console.log('too much inline code') } }">
+### Images
 
+- Every image requires `alt`.
+- Use empty `alt=""` **only** if decorative.
+- Always define width and height to avoid layout shift.
 
-3. Defensive Programming
+---
 
-Audio:
+## 4. JavaScript Rules
 
-Autoplay Policy: Never play audio on page load. Only play SFX inside user-triggered events (@click, @keydown).
+JavaScript is **optional**.
 
-Preload: Instantiate new Audio() objects in init() to avoid lag.
+Use JS only if:
+- HTML + CSS cannot solve the problem
+- It improves clarity or accessibility
 
-Images:
+Rules:
+- No inline scripts.
+- No global variables.
+- No DOM mutation without explanation.
+- Prefer build-time logic over runtime logic.
 
-Fallbacks: Always include @error logic for dynamic sprites.
+---
 
-<img :src="item.image" @error="$el.src = './assets/sprites/ui/missing.svg'">
+## 5. Component Design Rules
 
-4. Asset Cache Busting
+### Component Scope
 
-**CRITICAL:** See `asset-cache-busting.mdc` for complete rules.
+- One component = one responsibility.
+- No “mega components.”
+- If a component exceeds ~150 lines, split it.
 
-**Quick Reference:**
-- ALL local CSS/JS assets MUST include `?v=X.X` version query strings
-- Use relative paths (`./assets/...`, `./js/...`)
-- CDN assets do NOT need version strings
-- Increment version when deploying changes
+### Naming
 
-**Example:**
-```html
-<!-- ✅ CORRECT -->
-<link rel="stylesheet" href="./assets/css/style.css?v=1.1">
-<script src="./js/app.js?v=1.1"></script>
+- Components: `PascalCase`
+- Files: `kebab-case`
+- Props: explicit, typed, documented
 
-<!-- ❌ WRONG - Missing version string -->
-<link rel="stylesheet" href="./assets/css/style.css">
-<script src="./js/app.js"></script>
+---
+
+## 6. Styling Rules
+
+### Tailwind Usage
+
+- Tailwind is for:
+  - Layout
+  - Spacing
+  - Typography scale
+- **Colors and fonts must come from tokens**, not Tailwind color classes.
+
+Example:
+```ts
+class="bg-[color:var(--surface)] text-[color:var(--text)]"
+````
+
+### Prohibited Styling
+
+❌ No:
+
+* Inline color hex values
+* Hardcoded font families
+* Over-styled UI effects
+* Gradients unless explicitly approved
+
+---
+
+## 7. Content Safety Rules (Critical)
+
+This site represents **real professional work**.
+
+* Do not fabricate:
+
+  * Metrics
+  * Awards
+  * Dates
+  * Titles
+  * Certifications
+* If information is uncertain, omit it.
+* Past roles must be written in **past tense**.
+
+Every claim should be:
+
+* Verifiable
+* Linked
+* Or supported by an artifact (PDF, image, clip)
+
+---
+
+## 8. Error Handling & Defensive Defaults
+
+Pages must render safely even if:
+
+* A content item is missing
+* An image fails to load
+* A PDF is unavailable
+
+Rules:
+
+* Provide graceful fallbacks.
+* No runtime crashes.
+* No broken layouts.
+
+---
+
+## 9. Comments & Documentation
+
+* Comment **why**, not what.
+* No commented-out code in committed files.
+* If logic exists, explain its necessity.
+
+---
+
+## 10. SEO & Performance
+
+* Titles and meta descriptions are required.
+* Avoid blocking JS.
+* Lazy-load non-critical images.
+* No autoplay media.
+
+---
+
+## 11. What This Project Is NOT
+
+This project is NOT:
+
+* A product demo
+* A SaaS landing page
+* A design experiment
+* A personal playground
+
+It is a **professional credibility artifact** for employers.
+
+When in doubt:
+
+> Optimize for the recruiter who skims for 20 seconds and decides whether to keep reading.
+
 ```
 
-**Files to update:** `shop/index.html`, `shop/market.html`, `shop/admin.html`
+---
+
+## What I can do next (recommended)
+
+If you want to fully lock this down, I can:
+
+1. **Rewrite `defensive-programming.mdc` in the same style** (matching tone exactly)
+2. Generate **content schema guards** so Cursor *cannot* invent metrics
+3. Create a **Cursor master prompt** that explicitly references:
+   - architecture.md
+   - all-features.md
+   - branding-guide.mdc
+   - coding-standards.mdc
+
+Just tell me which one to do next.
+```

@@ -3,7 +3,6 @@
 @tailwind utilities;
 
 @layer base {
-  /* Override Tailwind base styles with our custom variables */
   :root {
     /* Brand Colors */
     --brand: #FFD670;

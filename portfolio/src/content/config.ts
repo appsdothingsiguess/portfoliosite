@@ -53,5 +53,23 @@ const leadership = defineCollection({
   })
 });
 
+// 4. Business Collection
+// Supports: Business Ventures, E-Commerce Operations
+const business = defineCollection({
+  type: 'content',
+  schema: z.object({
+    organization: z.string(), // e.g., "Spezz LLC"
+    role: z.string(), // e.g., "Founder"
+    dateStart: z.date(),
+    dateEnd: z.date().optional(), // If empty, UI displays "Present"
+    metrics: z.array(z.object({
+      value: z.string(), // "$500k+"
+      label: z.string(), // "Revenue"
+    })).optional(),
+    tags: z.array(z.string()).optional(), // e.g., ["E-Commerce", "P&L"]
+    summary: z.string(),
+  })
+});
+
 // Export the collections to be registered by Astro
-export const collections = { journalism, research, leadership };
+export const collections = { journalism, research, leadership, business };

@@ -1,33 +1,140 @@
 ---
-description: A gamified, pixel-art e-commerce system built on the JAMstack.
+description: architecture of the website
 alwaysApply: false
 ---
+This project is a **static, employer-facing personal website** designed to showcase:
+- Journalism work (clips, awards)
+- Psychology research (WPA, methods, tools)
+- Leadership & operations (Business Manager, Spezz LLC)
+- Resume & contact information
 
+The architecture prioritizes:
+- Credibility
+- Accessibility
+- Fast load times
+- Maintainability
+- Clear information hierarchy for recruiters
 
-Auth: User logs in via Google OAuth (Supabase).
+This is **not** an application platform, marketplace, or CMS.
 
-Load: App fetches profiles (points) and items (shop).
+---
 
-Interact: Alpine.js updates local state (Merchant reactions).
+## High-Level Architecture
 
-Transact: User clicks "Buy" -> Calls purchase_item RPC -> Updates DB.
+**Type:** Static site  
+**Rendering:** Static (no server-side rendering required)  
+**Primary stack:**  
+- Astro (content-driven static framework)
+- TypeScript
+- Tailwind CSS (mapped to CSS design tokens)
+- Markdown / MDX content collections
 
-Notify: DB Trigger fires Discord Webhook.
+**No backend. No authentication. No client-side state beyond UI.**
 
-2. Key Components
+---
 
-The Portal (/): Simple HTML/CSS entry point.
+## Architectural Principles (Non-Negotiable)
 
-The Shop (/shop/): Single Page Application (SPA) feel using standard HTML pages.
+1. **Content over interactivity**
+   - Employers skim.
+   - Avoid unnecessary JavaScript.
+   - Default to HTML + CSS.
 
-The Merchant: shop/js/app.js controls the sprite state based on user actions.
+2. **Proof > Claims**
+   - Every major claim must be supported by:
+     - A clip
+     - A PDF
+     - A photo
+     - A statistic with context
 
-3. Server Config (Nginx)
+3. **Accessibility is structural, not decorative**
+   - Semantic HTML required.
+   - Keyboard navigation must work end-to-end.
+   - Focus states must be visible.
 
-Ensure Nginx is configured to serve static files from /shop:
+4. **SEO by construction**
+   - Proper heading hierarchy.
+   - Descriptive titles and meta.
+   - Canonical URLs.
+   - Sitemap and robots.txt.
 
-location /shop {
-    alias /var/www/joeyspace.dev/shop;
-    index index.html;
-    try_files $uri $uri/ =404;
-}
+---
+
+## Directory Structure (Canonical)
+/
+├── src/
+│ ├── layouts/ # Base page layouts
+│ ├── pages/ # Route-based pages
+│ │ ├── index.astro
+│ │ ├── journalism/
+│ │ ├── research/
+│ │ ├── leadership/
+│ │ ├── resume/
+│ │ └── contact/
+│ ├── components/ # Reusable UI components
+│ ├── content/ # Markdown content collections
+│ │ ├── journalism/
+│ │ ├── research/
+│ │ └── achievements/
+│ └── styles/
+│ └── tokens.css # Design tokens (single source of truth)
+│
+├── public/
+│ ├── assets/
+│ │ ├── images/
+│ │ └── resume.pdf
+│
+├── rules/ # Cursor rule files (authoritative)
+└── docs/
+└── branding-guide.html
+
+## Content Model (Required)
+
+All dynamic content must come from **content collections**, not hardcoded JSX.
+
+### Journalism
+- title
+- outlet
+- date
+- topic/tags
+- url or pdf
+- short context (1–2 sentences)
+
+### Research
+- title
+- conference / venue
+- year
+- role
+- methods/tools (E-Prime, etc.)
+- artifact (poster PDF or image)
+
+### Achievements
+- title
+- organization
+- year
+- category
+- evidence (photo or link)
+
+---
+
+## Deployment
+
+The site must be deployable as **pure static output** via:
+- Cloudflare Pages
+- GitHub Pages
+
+No environment secrets.
+No runtime configuration.
+
+---
+
+## What This Architecture Explicitly Rejects
+
+- User accounts
+- Dashboards
+- Databases
+- CMS logins
+- Animations that distract from content
+- Startup-style growth widgets
+
+This is a **credibility artifact**, not a product.

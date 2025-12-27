@@ -1,3 +1,116 @@
 ---
 alwaysApply: true
 ---
+# Feature Inventory — Personal Portfolio Website
+
+This file defines **every allowed feature** in the system.
+If it is not listed here, it should not be implemented.
+
+---
+
+## Core Pages (Required)
+
+### Home
+- Clear statement of target roles (ABA / Research)
+- 3–5 proof cards:
+  - WPA presentation
+  - CCMA awards
+  - Business metrics (defensible only)
+- Primary CTAs:
+  - View Resume
+  - Contact
+- No long-form text
+
+---
+
+### Journalism
+- Filterable list of clips
+- Each clip shows:
+  - Title
+  - Outlet
+  - Year
+  - Topic tags
+- External links or PDFs
+- Optional impact/context line
+
+---
+
+### Research
+- Research entries with:
+  - Role (past tense)
+  - Methods/tools
+  - Participant count (if appropriate)
+  - Artifact (poster or abstract)
+- No claims of authorship beyond reality
+
+---
+
+### Leadership / Operations
+- Timeline-style presentation
+- Emphasis on:
+  - Systems
+  - Workflows
+  - Accountability
+- Avoid startup hype language
+
+---
+
+### Resume
+- Embedded PDF viewer
+- Download button
+- Fallback link if embed fails
+
+---
+
+### Contact
+- Email address
+- LinkedIn link
+- Optional form (no backend required)
+
+---
+
+## Cross-Cutting Features
+
+### SEO
+- Page titles
+- Meta descriptions
+- OpenGraph cards
+- Sitemap.xml
+- robots.txt
+
+---
+
+### Accessibility
+- Skip-to-content link
+- Keyboard navigable menus
+- Focus-visible styles
+- Proper heading order
+
+---
+
+### Performance
+- No blocking JS
+- Lazy-loaded images
+- Explicit image dimensions
+
+---
+
+## Explicitly Disallowed Features
+
+- User login
+- Admin panels
+- Analytics dashboards
+- Popups
+- Dark patterns
+- Tracking beyond basic analytics (if any)
+
+---
+
+## Feature Philosophy
+
+If a feature does not:
+- Increase credibility
+- Reduce recruiter friction
+- Improve clarity
+
+…it does not belong in this project.
