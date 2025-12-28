@@ -1,8 +1,8 @@
 ---
 organization: "Spezz LLC"
-role: "Founder & CEO"
-dateStart: 2020-05-30
-dateEnd: 2025-05-01
+role: "Chief Executive Officer"
+dateStart: 2020-03-01
+dateEnd: 2025-03-01
 metrics:
   - value: "$500k+"
     label: "Gross Annual Revenue"
@@ -10,8 +10,8 @@ metrics:
     label: "Order Accuracy"
   - value: "75,000"
     label: "Unique Customers"
-tags: ["E-Commerce", "Supply Chain", "P&L Management"]
-summary: "Built an e-commerce operation from 0 to 1. Handled inventory logistics, negotiated supplier contracts, and managed P&L for a profitable venture."
+tags: ["server-management", "linux-system-administration", "cloudflare", "marketing-strategy", "marketing", "sales-management", "employee-management", "online-marketing", "paid-social-media-advertising", "customer-retention", "e-commerce", "supply-chain"]
+summary: "Founded and scaled a global e-commerce marketplace enabling independent software developers to sell and distribute digital products. Grew the business from $0 to $500,000+ in gross profit, overseeing strategy, operations, and platform growth end-to-end. Managed business operations, including partnerships, vendor support, and performance tracking. Built and managed relationships with international vendors and developers, coordinating product onboarding, pricing, licensing, and fulfillment across multiple countries. Designed and operated a content-creator affiliate program connecting software developers with YouTubers, TikTok creators, and digital influencers. Maintained Linux servers and website backend support."
 modes: ["business"]
 ---
 
