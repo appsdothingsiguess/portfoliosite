@@ -180,24 +180,88 @@ summary: "Article summary"
 
 ### Skills Collection (`src/content/skills/`)
 
-Skills can be explicitly assigned to modes or derived relationally from experience files.
+Skills represent your technical abilities, tools, and certifications. They can be explicitly assigned to modes or automatically derived from experience files.
+
+#### Creating a New Skill
+
+1. **Create a markdown file** in `src/content/skills/`
+   - File name should be lowercase with hyphens (e.g., `spss-analysis.md`, `ap-style.md`)
+   - The file name becomes the skill's **slug** (used for matching)
+
+2. **Add frontmatter** with required fields:
+
+```yaml
+---
+name: "SPSS Analysis"              # Display name (required)
+icon: "bar-chart-3"                # Lucide icon name (required)
+shortDesc: "Statistical analysis & data visualization"  # Brief description (required)
+level: "Advanced"                  # Beginner, Intermediate, Advanced, or Certified (required)
+since: 2023                        # Year you started using this skill (required)
+order: 1                           # Optional: Manual sort order (lower = first)
+featured: false                    # Optional: Show in Top Skills section (default: false)
+modes: ["research", "aba"]         # Optional: Explicit mode assignment
+---
+```
+
+3. **Add description** below the frontmatter (optional but recommended):
+
+```markdown
+Experience with SPSS for statistical analysis, including regression models, ANOVA, and data visualization. Applied in psychology research contexts requiring rigorous statistical validation.
+```
+
+#### Skill Fields Explained
+
+- **`name`** (required): The display name shown on the portfolio
+- **`icon`** (required): Lucide icon name (see [Lucide Icons](https://lucide.dev/icons/))
+- **`shortDesc`** (required): Brief one-line description shown in skill cards
+- **`level`** (required): One of: `Beginner`, `Intermediate`, `Advanced`, `Certified`
+- **`since`** (required): Year (number) when you started using this skill
+- **`order`** (optional): Number for manual sorting (lower numbers appear first)
+- **`featured`** (optional): Boolean - if `true`, appears in Top Skills section
+- **`modes`** (optional): Array of modes (`research`, `aba`, `business`, `journalism`)
+
+#### Linking Skills to Experience Files
+
+Skills can be linked to experiences in two ways:
+
+**Method 1: Explicit Mode Assignment**
+Set `modes` in the skill file to explicitly assign it to specific portfolio modes:
 
 ```yaml
 ---
 name: "SPSS Analysis"
-icon: "bar-chart-3"
-shortDesc: "Statistical analysis & data visualization"
-level: "Advanced"
-since: 2023
-order: 1  # Optional: for manual sorting
-featured: true  # Appears in Top Skills section
-modes: ["research", "aba"]  # Optional: if not set, derived from experience files
+modes: ["research", "aba"]  # Appears in Research and ABA modes
 ---
 ```
 
-**Relational Logic**: If a skill's `modes` field is not set, it will appear in Top Skills if:
-- It's referenced in the `tools` array of research experiences for that mode
-- It's referenced in the `tags` array of leadership/business experiences for that mode
+**Method 2: Relational Matching (Automatic)**
+If `modes` is not set, the skill will automatically appear in Top Skills when:
+- It's referenced in the `tools` array of research experiences
+- It's referenced in the `tags` array of leadership/business experiences
+- The skill slug (filename) matches the tool/tag name
+
+**Example - Research Experience:**
+```yaml
+---
+title: "Research Project"
+tools: ["spss-analysis", "eprime-design"]  # These match skill file names
+modes: ["research"]
+---
+```
+
+**Example - Business Experience:**
+```yaml
+---
+organization: "Spezz LLC"
+tags: ["e-commerce", "supply-chain"]  # These match skill file names
+modes: ["business"]
+---
+```
+
+**Matching Rules:**
+- Exact match: `tools: ["spss-analysis"]` matches `spss-analysis.md`
+- Normalized matching: Spaces and special characters are converted to hyphens
+- Partial matching: "SPSS Analysis" matches "spss-analysis"
 
 ### Modes Collection (`src/content/modes/`)
 
@@ -225,25 +289,132 @@ description: "Leveraging E-Prime and SPSS to analyze behavioral patterns..."
 
 ## Skills System
 
+### Understanding Top Skills vs. Technical Toolkit
+
+The portfolio has two skill display areas:
+
+1. **Top Skills Section** - Featured skills shown prominently at the top
+2. **Technical Toolkit Section** - Complete list of all skills organized by category
+
 ### Top Skills Section
 
 The "Top Skills" section displays skills that are:
 1. **Explicitly assigned** to the current mode via the `modes` field in the skill file, OR
 2. **Derived relationally** from experience files (if `modes` is not set in the skill file)
 
-### Relational Derivation
+**To control which skills appear in Top Skills:**
 
-A skill appears in Top Skills if:
-- It's listed in the `tools` array of research experiences that have the current mode in their `modes` field
-- It's listed in the `tags` array of leadership/business experiences that have the current mode in their `modes` field
-- The skill slug matches or is similar to the tool/tag name
+- **Option A**: Set `featured: true` in the skill file (appears in all modes where skill is relevant)
+- **Option B**: Set `modes` array in the skill file (appears only in specified modes)
+- **Option C**: Link skill to experience files via `tools`/`tags` (appears when that experience is relevant to current mode)
 
-### Skill Prioritization
+### Relational Derivation (Automatic Matching)
 
-Skills are sorted by:
-1. `featured: true` skills first
-2. Then by `order` field (if set)
-3. Then alphabetically
+If a skill's `modes` field is **not set**, it will automatically appear in Top Skills when:
+
+1. **For Research/ABA modes:**
+   - The skill slug matches a tool name in research experiences
+   - Example: `spss-analysis.md` matches `tools: ["spss-analysis"]` in a research entry
+
+2. **For Business mode:**
+   - The skill slug matches a tag name in leadership/business experiences
+   - Example: `e-commerce.md` matches `tags: ["e-commerce"]` in a business entry
+
+3. **For Journalism mode:**
+   - Skills with `modes: ["journalism"]` appear
+   - Skills linked via tags in journalism-related leadership roles
+
+**Matching is flexible:**
+- Case-insensitive: "SPSS Analysis" matches "spss-analysis"
+- Normalized: Spaces and special characters are converted to hyphens
+- Partial matching: "spss" matches "spss-analysis"
+
+### Skill Prioritization & Sorting
+
+Skills are sorted in this order:
+
+1. **Featured skills first** (`featured: true`)
+2. **Then by order field** (lower numbers = higher priority)
+3. **Then alphabetically** by name
+
+**Example:**
+```yaml
+# This skill appears first (featured + low order)
+---
+name: "SPSS Analysis"
+featured: true
+order: 1
+---
+
+# This appears second (featured but higher order)
+---
+name: "E-Prime Design"
+featured: true
+order: 2
+---
+
+# This appears last (not featured)
+---
+name: "R Programming"
+featured: false
+---
+```
+
+### Icon Selection
+
+Skills use [Lucide Icons](https://lucide.dev/icons/). Choose an icon that represents the skill:
+
+**Common Icons:**
+- `bar-chart-3` - Data analysis, statistics
+- `microscope` - Research, science
+- `code` - Programming
+- `file-text` - Writing, documentation
+- `briefcase` - Business, operations
+- `users` - Leadership, team management
+- `wrench` - Technical tools
+- `database` - Data management
+- `cloud` - Cloud services
+- `server` - Server management
+
+**To find icons:**
+1. Visit [lucide.dev/icons](https://lucide.dev/icons/)
+2. Search for your skill type
+3. Use the icon name (kebab-case) in your skill file
+
+### Complete Skill Example
+
+```yaml
+---
+name: "SPSS Analysis"
+icon: "bar-chart-3"
+shortDesc: "Statistical analysis & data visualization"
+level: "Advanced"
+since: 2023
+order: 1
+featured: true
+modes: ["research", "aba"]
+---
+
+Experience with SPSS for statistical analysis, including regression models, ANOVA, and data visualization. Applied in psychology research contexts requiring rigorous statistical validation. Proficient in creating publication-ready charts and tables.
+```
+
+### Troubleshooting Skills
+
+**Skill not appearing in Top Skills:**
+- Check that `featured: true` OR `modes` array is set
+- Verify skill slug matches tool/tag name in experience files
+- Ensure experience file has the current mode in its `modes` field
+- Restart dev server after making changes
+
+**Skill appearing in wrong mode:**
+- Check `modes` array in skill file
+- Verify tool/tag names match skill slug exactly
+- Check experience file's `modes` field
+
+**Skill order incorrect:**
+- Set `order` field (lower = first)
+- Ensure `featured: true` for priority skills
+- Check for duplicate order values
 
 ## Section Ordering
 
@@ -347,11 +518,17 @@ The hero section content (title, badge text, badge color, and description) is st
 
 ### Adding a New Skill
 
-1. Create a markdown file in `src/content/skills/`
-2. Add frontmatter with skill details
-3. Optionally set `modes` field to explicitly assign to modes
-4. Optionally set `featured: true` to prioritize in Top Skills
-5. If `modes` is not set, the skill will be derived from experience files
+See the [Skills System](#skills-system) section above for complete documentation.
+
+**Quick Steps:**
+1. Create a markdown file in `src/content/skills/` (e.g., `my-skill.md`)
+2. Add required frontmatter fields: `name`, `icon`, `shortDesc`, `level`, `since`
+3. Optionally set `featured: true` to show in Top Skills
+4. Optionally set `modes` array to assign to specific portfolio modes
+5. Optionally set `order` for manual sorting
+6. Link to experience files via `tools` (research) or `tags` (leadership/business) for automatic mode matching
+
+**For detailed instructions, field explanations, icon selection, and examples, see the [Skills System](#skills-system) section.**
 
 ### Testing Modes
 
