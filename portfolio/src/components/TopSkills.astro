@@ -159,27 +159,14 @@ const sortedSkills = allRenderableSkills.sort((a, b) => {
   // Client-side mode switching for Top Skills
   (function() {
     function updateTopSkillsForMode(mode) {
-      // #region agent log
-      fetch('http://127.0.0.1:7244/ingest/a7ca4eda-4f6b-42fd-97e8-abf86a8386d5',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'TopSkills:updateTopSkillsForMode',message:'Updating TopSkills for mode',data:{mode},timestamp:Date.now(),sessionId:'debug-session',runId:'run6',hypothesisId:'F'})}).catch(()=>{});
-      // #endregion
-      
       const grid = document.getElementById('top-skills-grid');
       const section = document.getElementById('top-skills');
-      const description = section ? section.querySelector('p.text-muted') : null;
+      const description = section?.querySelector('p.text-muted');
       
-      if (!grid || !section) {
-        // #region agent log
-        fetch('http://127.0.0.1:7244/ingest/a7ca4eda-4f6b-42fd-97e8-abf86a8386d5',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'TopSkills:updateTopSkillsForMode',message:'Missing elements',data:{hasGrid:!!grid,hasSection:!!section},timestamp:Date.now(),sessionId:'debug-session',runId:'run6',hypothesisId:'F'})}).catch(()=>{});
-        // #endregion
-        return;
-      }
+      if (!grid || !section) return;
       
       const cards = grid.querySelectorAll('.top-skill-card');
       let visibleCount = 0;
-      
-      // #region agent log
-      fetch('http://127.0.0.1:7244/ingest/a7ca4eda-4f6b-42fd-97e8-abf86a8386d5',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'TopSkills:before-filtering',message:'Before filtering cards',data:{totalCards:cards.length,mode},timestamp:Date.now(),sessionId:'debug-session',runId:'run6',hypothesisId:'F'})}).catch(()=>{});
-      // #endregion
       
       // Update description
       if (description) {
@@ -194,12 +181,6 @@ const sortedSkills = allRenderableSkills.sort((a, b) => {
           const skillModes = modesAttr.split(',').map(m => m.trim()).filter(m => m);
           const shouldShow = skillModes.includes(mode);
           
-          // #region agent log
-          if (cards.length <= 10) { // Only log for small sets to avoid spam
-            fetch('http://127.0.0.1:7244/ingest/a7ca4eda-4f6b-42fd-97e8-abf86a8386d5',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'TopSkills:card-filter',message:'Filtering card',data:{modesAttr,skillModes,mode,shouldShow},timestamp:Date.now(),sessionId:'debug-session',runId:'run6',hypothesisId:'F'})}).catch(()=>{});
-          }
-          // #endregion
-          
           if (shouldShow) {
             card.style.display = '';
             visibleCount++;
@@ -208,19 +189,17 @@ const sortedSkills = allRenderableSkills.sort((a, b) => {
           }
         } else {
           // Skills without modes attribute are relationally matched - hide them on mode change
+          // They should only show for the initial mode they were matched for
           card.style.display = 'none';
         }
       });
-      
-      // #region agent log
-      fetch('http://127.0.0.1:7244/ingest/a7ca4eda-4f6b-42fd-97e8-abf86a8386d5',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'TopSkills:after-filtering',message:'After filtering cards',data:{visibleCount,totalCards:cards.length,mode},timestamp:Date.now(),sessionId:'debug-session',runId:'run6',hypothesisId:'F'})}).catch(()=>{});
-      // #endregion
       
       // Show/hide empty state message
       const emptyState = grid.querySelector('.md\\:col-span-3.card.text-center');
       if (emptyState) {
         if (visibleCount === 0) {
           emptyState.style.display = '';
+          // Update empty state message
           const emptyText = emptyState.querySelector('p.text-muted');
           if (emptyText) {
             emptyText.textContent = 'No skills found for ' + mode + ' mode.';
@@ -234,25 +213,14 @@ const sortedSkills = allRenderableSkills.sort((a, b) => {
     // Listen for mode changes from parent
     function initTopSkills() {
       const container = document.getElementById('top-skills-container');
-      // #region agent log
-      fetch('http://127.0.0.1:7244/ingest/a7ca4eda-4f6b-42fd-97e8-abf86a8386d5',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'TopSkills:initTopSkills',message:'Initializing TopSkills',data:{hasContainer:!!container},timestamp:Date.now(),sessionId:'debug-session',runId:'run6',hypothesisId:'G'})}).catch(()=>{});
-      // #endregion
-      
       if (container) {
         // Listen for modechange events
         container.addEventListener('modechange', function(e) {
-          // #region agent log
-          fetch('http://127.0.0.1:7244/ingest/a7ca4eda-4f6b-42fd-97e8-abf86a8386d5',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'TopSkills:modechange-event',message:'Modechange event received',data:{mode:e.detail.mode},timestamp:Date.now(),sessionId:'debug-session',runId:'run6',hypothesisId:'G'})}).catch(()=>{});
-          // #endregion
           updateTopSkillsForMode(e.detail.mode);
         });
         
         // Initial update based on data-mode attribute
         const initialMode = container.getAttribute('data-mode') || 'aba';
-        // #region agent log
-        fetch('http://127.0.0.1:7244/ingest/a7ca4eda-4f6b-42fd-97e8-abf86a8386d5',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'TopSkills:initial-mode',message:'Setting initial mode',data:{initialMode},timestamp:Date.now(),sessionId:'debug-session',runId:'run6',hypothesisId:'G'})}).catch(()=>{});
-        // #endregion
-        
         // Set initial visibility - skills matching current mode are visible, others hidden
         const grid = document.getElementById('top-skills-grid');
         if (grid) {
@@ -275,8 +243,7 @@ const sortedSkills = allRenderableSkills.sort((a, b) => {
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', initTopSkills);
     } else {
-      // Wait a bit to ensure container exists
-      setTimeout(initTopSkills, 50);
+      initTopSkills();
     }
   })();
 </script>

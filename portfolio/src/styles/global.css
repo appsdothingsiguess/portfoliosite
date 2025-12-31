@@ -154,4 +154,22 @@
       background-color: transparent; 
     }
   }
+/* Tag container - prevents horizontal overflow */
+.tag-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+/* Individual tag pill with text truncation */
+.tag-pill {
+  @apply bg-surface-2 text-muted text-xs font-medium px-2.5 py-1 rounded-full border border-border;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+  flex-shrink: 0;
+}
 }
