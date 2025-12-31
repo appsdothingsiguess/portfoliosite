@@ -27,12 +27,19 @@ const research = defineCollection({
   schema: z.object({
     title: z.string(),
     role: z.string(), // e.g., "First Author", "Research Assistant"
+    organization: z.string().optional(), // e.g., "Biola University", "Research Lab"
     conference: z.string().optional(), // e.g., "WPA 2025"
-    date: z.date(),
+    date: z.date().optional(), // Single date (for poster/conference dates)
+    dateStart: z.date().optional(), // Start date for date range
+    dateEnd: z.date().optional(), // End date for date range (if empty, displays "Present")
     tools: z.array(z.string()), // e.g., ["E-Prime", "SPSS"]
     posterUrl: z.string().optional(), // Path to PDF in /public/assets/pdfs/
     methodology: z.string().optional(), // For the accordion expansion
     findings: z.array(z.string()).optional(), // Bullet points for findings
+    metrics: z.array(z.object({
+      value: z.string(), // e.g., "75+"
+      label: z.string(), // e.g., "Participants"
+    })).optional(),
     modes: z.array(z.enum(['research', 'aba', 'business', 'journalism'])).default(['research']),
   })
 });
