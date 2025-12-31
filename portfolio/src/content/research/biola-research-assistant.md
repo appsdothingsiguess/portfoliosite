@@ -16,3 +16,4 @@ findings:
 
 Collaborated with a multidisciplinary research team to design and execute the S.M.A.R.T. psychological research experiment, supporting recruitment and data collection for 75+ participants. Designed, programmed, and administered experimental protocols using E-Prime, ensuring precise stimulus timing, response logging, and experimental control. Assisted in maintaining data integrity through standardized procedures, participant management, and protocol adherence. Conducted statistical analysis and synthesis of experimental results, translating quantitative findings into clear research conclusions. Co-authored and presented research outcomes at the 2025 Western Psychological Association (WPA) Conference, communicating methods and results to an academic audience. Contributed to experiment iteration, troubleshooting, and refinement to improve validity, reliability, and overall study quality.
 
+

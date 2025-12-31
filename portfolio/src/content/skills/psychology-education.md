@@ -10,3 +10,4 @@ modes: ["research", "aba"]
 
 Strong academic foundation in psychology, including experimental design, behavioral analysis, and research methodology. Applied in research assistant roles and academic presentations.
 
+

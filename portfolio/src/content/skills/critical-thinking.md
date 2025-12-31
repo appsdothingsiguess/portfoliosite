@@ -9,3 +9,4 @@ featured: false
 
 Strong analytical skills applied across research, business, and journalism contexts. Ability to evaluate evidence, synthesize information, and make data-driven decisions.
 
+

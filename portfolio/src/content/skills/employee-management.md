@@ -10,3 +10,4 @@ modes: ["business", "journalism"]
 
 Experience managing teams, handling payroll, coordinating hiring processes, and maintaining employee relations. Managed 30+ employees across multiple departments.
 
+

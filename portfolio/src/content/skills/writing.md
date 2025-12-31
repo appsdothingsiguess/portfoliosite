@@ -9,3 +9,4 @@ featured: false
 
 Proficient in various writing styles including academic, journalistic, and technical writing. Published articles, research papers, and professional documentation.
 
+

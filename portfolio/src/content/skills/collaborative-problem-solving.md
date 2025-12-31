@@ -9,3 +9,4 @@ featured: false
 
 Experience working within multidisciplinary teams to identify challenges, develop solutions, and implement effective strategies. Applied in research and business contexts requiring coordinated effort.
 
+

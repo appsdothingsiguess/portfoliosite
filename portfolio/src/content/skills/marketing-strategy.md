@@ -10,3 +10,4 @@ modes: ["business", "journalism"]
 
 Experience developing and executing marketing strategies across multiple channels. Coordinated organic, affiliate-driven, and creator-based marketing initiatives with measurable results.
 
+

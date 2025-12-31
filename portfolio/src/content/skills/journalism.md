@@ -10,3 +10,4 @@ modes: ["journalism"]
 
 Experience in news writing, article production, and media content creation. Published multiple articles with demonstrated readership impact and editorial consistency.
 
+

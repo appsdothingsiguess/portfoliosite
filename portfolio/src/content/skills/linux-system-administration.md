@@ -10,3 +10,4 @@ modes: ["business"]
 
 Proficient in Linux system administration, including server configuration, security management, and performance monitoring. Maintained production servers for e-commerce platform.
 
+

@@ -10,3 +10,4 @@ modes: ["journalism"]
 
 Proficient in WordPress development, including custom plugin development and theme customization. Developed copyright detection WordPress plugin and managed WordPress-based websites.
 
+

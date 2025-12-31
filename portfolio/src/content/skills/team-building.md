@@ -9,3 +9,4 @@ featured: false
 
 Experience building and maintaining productive team environments through clear communication, shared goals, and supportive collaboration.
 
+

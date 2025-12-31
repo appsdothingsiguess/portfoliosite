@@ -10,3 +10,4 @@ modes: ["business"]
 
 Broad technical skills applicable to technology careers, including system administration, web development, and technical problem-solving. Developed through hands-on business operations.
 
+

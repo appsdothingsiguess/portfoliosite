@@ -9,3 +9,4 @@ featured: false
 
 Experience designing, programming, and administering experimental protocols. Proficient in maintaining experimental control, ensuring validity, and refining methodologies for improved reliability.
 
+

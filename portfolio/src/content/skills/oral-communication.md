@@ -9,3 +9,4 @@ featured: false
 
 Strong verbal communication skills demonstrated through academic presentations, conference talks, and stakeholder coordination. Experience presenting research findings to academic audiences.
 
+

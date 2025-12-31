@@ -10,3 +10,4 @@ modes: ["business", "journalism"]
 
 Experience managing paid advertising campaigns across social media platforms, optimizing ad spend, and tracking performance metrics for conversion optimization.
 
+

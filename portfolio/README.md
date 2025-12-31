@@ -1,4 +1,74 @@
-# Portfolio Website - Mode System Documentation
+# Portfolio Website
+
+A professional portfolio website built with Astro, featuring a mode-based system that allows content to be reordered and presented differently based on URL parameters.
+
+## Getting Started
+
+### Prerequisites
+
+- **Node.js** (v18 or higher recommended)
+- **npm** (comes with Node.js) or **yarn**
+
+### Installation
+
+1. **Navigate to the project directory:**
+   ```bash
+   cd portfolio
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+### Running the Project
+
+#### Development Server
+
+Start the development server with hot-reload:
+
+```bash
+npm run dev
+```
+
+Or use the alternative command:
+
+```bash
+npm start
+```
+
+The site will be available at `http://localhost:4321` (Astro's default port).
+
+**Note:** The dev server automatically reloads when you make changes to files.
+
+#### Building for Production
+
+Build the static site for production:
+
+```bash
+npm run build
+```
+
+This generates optimized static files in the `dist/` directory.
+
+#### Preview Production Build
+
+Preview the production build locally:
+
+```bash
+npm run preview
+```
+
+This serves the built site from the `dist/` directory, allowing you to test the production build before deploying.
+
+### Available Scripts
+
+- `npm run dev` / `npm start` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+- `npm run astro` - Run Astro CLI commands
+
+---
 
 ## Overview
 

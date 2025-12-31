@@ -10,3 +10,4 @@ modes: ["research", "aba"]
 
 Experience with clinical research methodologies, protocol adherence, and participant management. Applied in psychology research contexts requiring ethical compliance and data integrity.
 
+

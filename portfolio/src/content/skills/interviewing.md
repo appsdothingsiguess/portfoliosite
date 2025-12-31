@@ -10,3 +10,4 @@ modes: ["journalism", "research"]
 
 Experience conducting structured interviews for research and journalism purposes. Skilled in asking effective questions and gathering comprehensive information.
 
+
