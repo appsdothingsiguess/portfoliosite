@@ -33,9 +33,80 @@ function getLevelColors(level: string) {
       return 'bg-gray-50 text-gray-800 border-gray-200';
   }
 }
+
+// Auto-classification function for skills
+function classifySkill(skill: CollectionEntry<'skills'>): 'psychology' | 'research' | 'business' | 'leadership' {
+  // If category is explicitly set, use it
+  if (skill.data.category) {
+    return skill.data.category;
+  }
+  
+  const name = skill.data.name.toLowerCase();
+  const shortDesc = skill.data.shortDesc.toLowerCase();
+  const modes = skill.data.modes || [];
+  const searchText = `${name} ${shortDesc}`;
+  
+  // PSYCHOLOGY CATEGORY
+  // Skills with modes containing 'aba'
+  if (modes.includes('aba')) {
+    return 'psychology';
+  }
+  // Skills matching psychology keywords
+  const psychologyKeywords = ['behavioral', 'clinical', 'intervention', 'treatment', 'therapy', 'assessment', 'diagnosis'];
+  if (psychologyKeywords.some(keyword => searchText.includes(keyword))) {
+    return 'psychology';
+  }
+  
+  // RESEARCH CATEGORY
+  // Skills with modes containing 'research'
+  if (modes.includes('research')) {
+    return 'research';
+  }
+  // Skills matching research keywords
+  const researchKeywords = ['spss', 'e-prime', 'data collection', 'statistical', 'analysis', 'irb', 'protocol', 'experimental', 'participant', 'qualtrics', 'jasp', 'r programming'];
+  if (researchKeywords.some(keyword => searchText.includes(keyword))) {
+    return 'research';
+  }
+  
+  // BUSINESS CATEGORY
+  // Skills with modes containing 'business'
+  if (modes.includes('business')) {
+    return 'business';
+  }
+  // Skills matching business keywords
+  const businessKeywords = ['budget', 'p&l', 'revenue', 'sales', 'marketing', 'e-commerce', 'payroll', 'vendor', 'finance', 'roi', 'profit'];
+  if (businessKeywords.some(keyword => searchText.includes(keyword))) {
+    return 'business';
+  }
+  
+  // LEADERSHIP CATEGORY (default fallback)
+  // Skills matching leadership keywords
+  const leadershipKeywords = ['team', 'management', 'leadership', 'coordination', 'hiring', 'employee', 'communication', 'collaboration', 'operational', 'project management', 'wordpress', 'compliance'];
+  if (leadershipKeywords.some(keyword => searchText.includes(keyword))) {
+    return 'leadership';
+  }
+  
+  // Default fallback
+  return 'leadership';
+}
+
+// Classify all skills
+const classifiedSkills = renderedSkills.map(skill => ({
+  ...skill,
+  computedCategory: classifySkill(skill),
+}));
 ---
 
 <div class="space-y-4">
+  <!-- Filter Buttons -->
+  <div class="flex gap-2 flex-wrap mb-6">
+    <button class="tab-btn active" data-filter="all">All Skills</button>
+    <button class="tab-btn" data-filter="psychology">Psychology & Clinical</button>
+    <button class="tab-btn" data-filter="research">Research & Analysis</button>
+    <button class="tab-btn" data-filter="business">Business & Operations</button>
+    <button class="tab-btn" data-filter="leadership">Leadership & Technical</button>
+  </div>
+
   <!-- Quick View Toggle -->
   <div class="flex justify-end mb-4">
     <button
@@ -48,12 +119,12 @@ function getLevelColors(level: string) {
     </button>
   </div>
 
-  {renderedSkills.map((skill, index) => {
+  {classifiedSkills.map((skill, index) => {
     const skillId = `skill-${index}`;
     const levelColors = getLevelColors(skill.data.level);
     
     return (
-      <div class="card p-1 transition-all duration-300 hover:scale-[1.01]">
+      <div class="card p-1 transition-all duration-300 hover:scale-[1.01] skill-item" data-category={skill.computedCategory}>
         <details 
           class="group open:bg-surface-2/30 rounded-xl transition-colors skill-details"
           id={skillId}
@@ -110,7 +181,52 @@ function getLevelColors(level: string) {
 </div>
 
 <script is:inline>
-  // Expand All / Collapse All functionality
+  // Category Filter Functionality
+  (function() {
+    function initFilters() {
+      const filterButtons = document.querySelectorAll('[data-filter]');
+      const skillItems = document.querySelectorAll('.skill-item');
+      
+      if (!filterButtons.length || !skillItems.length) return;
+      
+      filterButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const filter = btn.getAttribute('data-filter');
+          
+          // Update active state
+          filterButtons.forEach(b => {
+            b.classList.remove('active');
+          });
+          btn.classList.add('active');
+          
+          // Filter skills
+          skillItems.forEach(skill => {
+            const category = skill.getAttribute('data-category');
+            if (filter === 'all' || category === filter) {
+              skill.style.display = 'block';
+            } else {
+              skill.style.display = 'none';
+            }
+          });
+          
+          // Trigger update for Expand All button state after filter change
+          const event = new CustomEvent('filterChanged');
+          document.dispatchEvent(event);
+        });
+      });
+    }
+    
+    // Initialize filters when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(initFilters, 100);
+      });
+    } else {
+      setTimeout(initFilters, 100);
+    }
+  })();
+
+  // Expand All / Collapse All functionality (updated to work with filtered view)
   (function() {
     // Wait for DOM and Lucide to be ready
     function initToggle() {
@@ -128,13 +244,22 @@ function getLevelColors(level: string) {
         }
       });
       
-      let allExpanded = Array.from(allDetails).every(d => d.open);
+      // Get visible skills only (respects filter)
+      function getVisibleDetails() {
+        return Array.from(allDetails).filter(details => {
+          const skillItem = details.closest('.skill-item');
+          return skillItem && skillItem.style.display !== 'none';
+        });
+      }
+      
+      let allExpanded = getVisibleDetails().every(d => d.open);
       updateToggleButton(allExpanded);
       
       toggleButton.addEventListener('click', () => {
+        const visibleDetails = getVisibleDetails();
         allExpanded = !allExpanded;
         
-        allDetails.forEach((details) => {
+        visibleDetails.forEach((details) => {
           const summary = details.querySelector('summary');
           if (summary) {
             if (allExpanded) {
@@ -167,15 +292,23 @@ function getLevelColors(level: string) {
         if (summary) {
           details.addEventListener('toggle', () => {
             summary.setAttribute('aria-expanded', details.open ? 'true' : 'false');
-            // Update toggle button state if all are expanded/collapsed
-            const allExpandedNow = Array.from(allDetails).every(d => d.open);
-            const allCollapsedNow = Array.from(allDetails).every(d => !d.open);
+            // Update toggle button state if all visible are expanded/collapsed
+            const visibleDetails = getVisibleDetails();
+            const allExpandedNow = visibleDetails.length > 0 && visibleDetails.every(d => d.open);
+            const allCollapsedNow = visibleDetails.length > 0 && visibleDetails.every(d => !d.open);
             if (allExpandedNow || allCollapsedNow) {
               allExpanded = allExpandedNow;
               updateToggleButton(allExpanded);
             }
           });
         }
+      });
+      
+      // Update Expand All button state when filter changes
+      document.addEventListener('filterChanged', () => {
+        const visibleDetails = getVisibleDetails();
+        allExpanded = visibleDetails.length > 0 && visibleDetails.every(d => d.open);
+        updateToggleButton(allExpanded);
       });
     }
     

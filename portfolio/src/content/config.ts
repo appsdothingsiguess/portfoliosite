@@ -88,7 +88,7 @@ const business = defineCollection({
 
 // 5. Skills Collection
 // Supports: Technical Skills, Tools, Certifications
-// Note: Category is now derived from which experience files reference this skill
+// Note: Category can be explicitly set or auto-classified based on skill context
 const skills = defineCollection({
   type: 'content',
   schema: z.object({
@@ -100,6 +100,7 @@ const skills = defineCollection({
     order: z.number().optional(), // For manual sorting
     featured: z.boolean().default(false), // Determines if skill appears in "Top Skills" section
     modes: z.array(z.enum(['research', 'aba', 'business', 'journalism'])).optional(), // Optional: if not set, derived from experience files
+    category: z.enum(['psychology', 'research', 'business', 'leadership']).optional(), // Optional - will auto-classify if not set
   }),
 });
 
