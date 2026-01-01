@@ -4,24 +4,25 @@ role: "Research Assistant"
 organization: "Biola University"
 conference: "Western Psychological Association (WPA) 2025"
 dateStart: 2024-08-01
-dateEnd: 2025-12-31
-date: 2025-04-15
+dateEnd: 2025-04-15
 metrics:
-  - value: "75+"
-    label: "Participants"
-  - value: "100%"
-    label: "Data Integrity"
-  - value: "1 Successful"
+  - value: "68"
+    label: "Participants Recruited"
+  - value: "Modified Stroop"
+    label: "Experimental Design"
+  - value: "1"
     label: "Conference Presentation"
-tools: ["SPSS Analysis", "E-Prime Design", "JASP", "IRB Compliance", "Data Collection", "Experimental Research", "Qualtrics", "Clinical Research"]
+tools: ["E-Prime Design", "SPSS Analysis", "Data Collection", "IRB Compliance", "Qualtrics", "Participant Recruitment", "Statistical Analysis", "Experimental Research"]
 posterUrl: "/assets/pdfs/wpa-2025-poster.pdf"
-modes: ["research", "aba"]
-methodology: "Collaborated with a multidisciplinary research team to design and execute the S.M.A.R.T. psychological research experiment, supporting recruitment and data collection for 75+ participants. Designed, programmed, and administered experimental protocols using E-Prime, ensuring precise stimulus timing, response logging, and experimental control."
+summary: "Investigated social media attentional bias and gratitude using a modified Stroop task with 68 participants. Found significant negative correlation (r = -0.278, p < .05) and presented at WPA 2025."
+methodology: "Co-designed and executed psychological research study investigating the relationship between social media attentional bias, gratitude, contentment (PEACE), and fear of missing out (FOMO) using a modified Stroop task. Recruited and coordinated 68 undergraduate participants, administering computerized experimental protocols and multiple validated questionnaires (GQ-6, PEACE Scale, FOMO Scale) via Qualtrics. Conducted statistical correlation analysis revealing significant negative correlation between gratitude and attentional bias (r = -0.278, p < .05). Presented findings at the 2025 Western Psychological Association Conference."
 findings:
-  - "Supported recruitment and data collection for 75+ participants"
-  - "Maintained data integrity through standardized procedures and protocol adherence"
-  - "Conducted statistical analysis and synthesis of experimental results"
-  - "Co-authored and presented research outcomes at the 2025 Western Psychological Association (WPA) Conference"
+  - "Recruited and coordinated 68 undergraduate participants (mean age 20.07) with diverse demographic representation"
+  - "Designed and programmed modified Stroop task using social media and non-social media stimuli for attentional bias measurement"
+  - "Administered three validated psychological measures: Gratitude Questionnaire-6 (GQ-6), PEACE Scale, and 10-item FOMO Scale"
+  - "Conducted correlation and paired-samples t-test statistical analyses to examine relationships between variables"
+  - "Discovered significant negative correlation (r = -0.278, p < .05) between gratitude and social media attentional bias"
+  - "Co-authored and presented research poster at 2025 Western Psychological Association (WPA) Conference"
+  - "Collaborated with multidisciplinary research team including four co-researchers and faculty advisor"
+modes: ["research", "aba"]
 ---
-
-

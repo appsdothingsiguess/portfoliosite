@@ -35,6 +35,7 @@ const research = defineCollection({
     dateEnd: z.date().optional(), // End date for date range (if empty, displays "Present")
     tools: z.array(z.string()), // e.g., ["E-Prime", "SPSS"]
     posterUrl: z.string().optional(), // Path to PDF in /public/assets/pdfs/
+    summary: z.string().optional(), // Brief summary for card preview
     methodology: z.string().optional(), // For the accordion expansion
     findings: z.array(z.string()).optional(), // Bullet points for findings
     metrics: z.array(z.object({

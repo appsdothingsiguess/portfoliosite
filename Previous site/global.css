@@ -1,0 +1,157 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Brand Colors */
+    --brand: #FFD670;
+    --brand-ink: #2A1F00;
+
+    /* Neutrals */
+    --bg: #F7F7FB;
+    --surface: #FFFFFF;
+    --surface-2: #F0F2F8;
+    
+    /* Text */
+    --text: #0B1220;
+    --muted: #475569;
+    --border: #D6DBE8;
+
+    /* Functional */
+    --info: #2563EB;
+    --success: #16A34A;
+    --warning: #D97706;
+    --danger: #DC2626;
+
+    /* Focus ring */
+    --focus: #2563EB;
+    --focus-outer: rgba(37, 99, 235, 0.25);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    background-color: var(--bg);
+    color: var(--text);
+  }
+
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Newsreader', serif;
+  }
+
+  /* Accessibility: High visibility focus states with outer glow */
+  :where(a, button, input, textarea, select, [tabindex]):focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 6px var(--focus-outer);
+    border-radius: 8px;
+  }
+  
+  /* Details/Summary cleanup */
+  details > summary { 
+    list-style: none; 
+    cursor: pointer; 
+  }
+  details > summary::-webkit-details-marker { 
+    display: none; 
+  }
+  
+  /* Accordion animation */
+  details[open] summary ~ * { 
+    animation: sweep 0.2s ease-in-out; 
+  }
+  
+  @keyframes sweep {
+    0% { 
+      opacity: 0; 
+      transform: translateY(-10px);
+    }
+    100% { 
+      opacity: 1; 
+      transform: translateY(0);
+    }
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-brand text-brand-ink font-semibold transition-all hover:brightness-95;
+    padding: 10px 14px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  
+  .btn-primary:active {
+    transform: translateY(1px);
+  }
+  
+  .btn-secondary {
+    @apply bg-surface border border-border text-[var(--text)] font-medium transition-all hover:bg-surface-2;
+    padding: 10px 14px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  
+  .card {
+    @apply bg-surface border border-border rounded-xl transition-all duration-300;
+    box-shadow: 0 8px 24px rgba(11, 18, 32, 0.10);
+  }
+  
+  .card:hover {
+    box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.08);
+    border-color: #CBD5E1;
+  }
+  
+  .pill {
+    @apply bg-surface-2 text-muted text-xs font-semibold px-3 py-1 rounded-full border border-border inline-flex items-center justify-center gap-1;
+  }
+  
+  /* Tab buttons for journalism section */
+  .tab-btn {
+    padding: 6px 16px;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    background: transparent;
+    color: var(--muted);
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  
+  .tab-btn:hover {
+    background: var(--surface-2);
+    color: var(--text);
+  }
+  
+  .tab-btn.active {
+    background: var(--text);
+    color: var(--surface);
+  }
+  
+  /* Highlight animation for dynamic focus */
+  .highlight-section {
+    animation: flash-focus 2s ease-out;
+  }
+  
+  @keyframes flash-focus {
+    0% { 
+      background-color: rgba(255, 214, 112, 0.2); 
+    }
+    100% { 
+      background-color: transparent; 
+    }
+  }
+}

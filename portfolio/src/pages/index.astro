@@ -343,8 +343,9 @@ const sectionOrder = getSectionOrder(currentMode);
 
       <div class="space-y-6">
         {sortedResearch.map((item) => {
-          // Generate Summary Headline: Use first finding or methodology first sentence
-          const summaryHeadline = item.data.findings?.[0] || 
+          // Generate Summary Headline: Use summary if available, otherwise first finding or methodology first sentence
+          const summaryHeadline = item.data.summary || 
+            item.data.findings?.[0] || 
             (item.data.methodology ? item.data.methodology.split('.')[0] + '.' : 
             (item.data.posterUrl ? "Poster presentation." : 
             "Research project details available."));
@@ -354,7 +355,10 @@ const sectionOrder = getSectionOrder(currentMode);
               <details class="group open:bg-surface-2/30 rounded-xl transition-colors">
                 <summary class="p-6 md:p-8 cursor-pointer relative list-none">
                   <div class="flex flex-wrap items-center gap-3 mb-3">
-                    <h3 class="text-xl font-serif font-bold group-hover:text-info transition-colors">{item.data.title}</h3>
+                    <h3 class="text-xl font-serif font-bold group-hover:text-info transition-colors flex items-center gap-2">
+                      <i data-lucide="microscope" class="w-5 h-5 text-muted"></i>
+                      {item.data.title}
+                    </h3>
                     {item.data.organization && (
                       <span class="pill bg-blue-50 text-blue-800 border-blue-200">{item.data.organization}</span>
                     )}
@@ -378,7 +382,7 @@ const sectionOrder = getSectionOrder(currentMode);
                       ))}
                     </div>
                   </div>
-                  <p class="text-base font-medium text-[var(--text)] mb-3 leading-snug">
+                  <p class="text-base font-medium text-[var(--text)] mb-3 leading-snug line-clamp-2">
                     {summaryHeadline}
                   </p>
                   {item.data.metrics && item.data.metrics.length > 0 && (
@@ -462,7 +466,10 @@ const sectionOrder = getSectionOrder(currentMode);
                 <details class="group open:bg-surface-2/30 rounded-xl transition-colors">
                   <summary class="p-6 md:p-8 cursor-pointer relative list-none">
                     <div class="flex flex-wrap items-center gap-3 mb-3">
-                      <h3 class="text-xl font-serif font-bold group-hover:text-info transition-colors">{item.data.role}</h3>
+                      <h3 class="text-xl font-serif font-bold group-hover:text-info transition-colors flex items-center gap-2">
+                        <i data-lucide="briefcase" class="w-5 h-5 text-muted"></i>
+                        {item.data.role}
+                      </h3>
                       <span class="pill bg-blue-50 text-blue-800 border-blue-200">{item.data.organization}</span>
                     </div>
                     <div class="text-sm text-muted mb-3">
@@ -478,7 +485,7 @@ const sectionOrder = getSectionOrder(currentMode);
                         </div>
                       </div>
                     )}
-                    <p class="text-base font-medium text-[var(--text)] mb-3 leading-snug">
+                    <p class="text-base font-medium text-[var(--text)] mb-3 leading-snug line-clamp-2">
                       {summaryHeadline}
                     </p>
                     {item.data.metrics && item.data.metrics.length > 0 && (
@@ -556,7 +563,10 @@ const sectionOrder = getSectionOrder(currentMode);
                 <details class="group open:bg-surface-2/30 rounded-xl transition-colors">
                   <summary class="p-6 md:p-8 cursor-pointer relative list-none">
                     <div class="flex flex-wrap items-center gap-3 mb-3">
-                      <h3 class="text-xl font-serif font-bold group-hover:text-info transition-colors">{item.data.role}</h3>
+                      <h3 class="text-xl font-serif font-bold group-hover:text-info transition-colors flex items-center gap-2">
+                        <i data-lucide="users" class="w-5 h-5 text-muted"></i>
+                        {item.data.role}
+                      </h3>
                       <span class="pill bg-green-50 text-green-800 border-green-200">{item.data.organization}</span>
                     </div>
                     <div class="text-sm text-muted mb-3">
@@ -572,7 +582,7 @@ const sectionOrder = getSectionOrder(currentMode);
                         </div>
                       </div>
                     )}
-                    <p class="text-base font-medium text-[var(--text)] mb-3 leading-snug">
+                    <p class="text-base font-medium text-[var(--text)] mb-3 leading-snug line-clamp-2">
                       {summaryHeadline}
                     </p>
                     {item.data.metrics && item.data.metrics.length > 0 && (
@@ -667,14 +677,14 @@ const sectionOrder = getSectionOrder(currentMode);
             
             return (
               <article 
-                class="card p-1 flex flex-col h-full journalism-item" 
+                class="card p-1 flex flex-col journalism-item w-full" 
                 data-type={item.data.type}
               >
-                <details class="group flex flex-col h-full open:bg-surface-2/30 rounded-xl transition-colors">
-                  <summary class="p-6 flex flex-col h-full cursor-pointer relative list-none">
+                <details class="group flex flex-col open:bg-surface-2/30 rounded-xl transition-colors journalism-details">
+                  <summary class="p-3 md:p-4 flex flex-col cursor-pointer relative list-none group-open:p-6" style="min-height: 140px;">
                     {/* Publication Badge + Year */}
-                    <div class="flex justify-between items-center mb-3">
-                      <span class={`pill ${item.data.type === 'Article' ? 'bg-blue-50 text-blue-800 border-blue-200' : 'bg-purple-50 text-purple-800 border-purple-200'}`}>
+                    <div class="flex justify-between items-center mb-2 group-open:mb-3">
+                      <span class={`pill text-xs group-open:text-sm ${item.data.type === 'Article' ? 'bg-blue-50 text-blue-800 border-blue-200' : 'bg-purple-50 text-purple-800 border-purple-200'}`}>
                         {item.data.type === 'Article' ? (
                           <>
                             <i data-lucide="file-text" class="w-3 h-3"></i>
@@ -691,7 +701,7 @@ const sectionOrder = getSectionOrder(currentMode);
                     </div>
                     
                     {/* Title - Clickable */}
-                    <h3 class="text-xl font-serif font-bold mb-3 leading-tight group-hover:text-info transition-colors">
+                    <h3 class="text-base md:text-lg group-open:text-xl font-serif font-bold mb-2 group-open:mb-3 leading-tight group-hover:text-info transition-colors">
                       <a 
                         href={item.data.url} 
                         target="_blank" 
@@ -702,12 +712,12 @@ const sectionOrder = getSectionOrder(currentMode);
                     </h3>
                     
                     {/* Summary */}
-                    <p class="text-muted text-sm mb-4 flex-grow leading-relaxed line-clamp-3">
+                    <p class="text-muted text-xs group-open:text-sm mb-2 group-open:mb-4 flex-grow leading-relaxed line-clamp-2 group-open:line-clamp-3">
                       {item.data.summary}
                     </p>
                     
                     {/* Actions Row */}
-                    <div class="mt-auto pt-4 flex items-center border-t border-border">
+                    <div class="mt-auto pt-2 group-open:pt-4 flex items-center border-t border-border">
                       <a 
                         href={item.data.url} 
                         target="_blank" 
@@ -774,14 +784,14 @@ const sectionOrder = getSectionOrder(currentMode);
                 
                 return (
                   <article 
-                    class="card p-1 flex flex-col h-full journalism-item" 
+                    class="card p-1 flex flex-col journalism-item w-full" 
                     data-type={item.data.type}
                   >
-                    <details class="group flex flex-col h-full open:bg-surface-2/30 rounded-xl transition-colors">
-                      <summary class="p-6 flex flex-col h-full cursor-pointer relative list-none">
+                    <details class="group flex flex-col open:bg-surface-2/30 rounded-xl transition-colors journalism-details">
+                      <summary class="p-3 md:p-4 flex flex-col cursor-pointer relative list-none group-open:p-6" style="min-height: 140px;">
                         {/* Publication Badge + Year */}
-                        <div class="flex justify-between items-center mb-3">
-                          <span class={`pill ${item.data.type === 'Article' ? 'bg-blue-50 text-blue-800 border-blue-200' : 'bg-purple-50 text-purple-800 border-purple-200'}`}>
+                        <div class="flex justify-between items-center mb-2 group-open:mb-3">
+                          <span class={`pill text-xs group-open:text-sm ${item.data.type === 'Article' ? 'bg-blue-50 text-blue-800 border-blue-200' : 'bg-purple-50 text-purple-800 border-purple-200'}`}>
                             {item.data.type === 'Article' ? (
                               <>
                                 <i data-lucide="file-text" class="w-3 h-3"></i>
@@ -798,7 +808,7 @@ const sectionOrder = getSectionOrder(currentMode);
                         </div>
                         
                         {/* Title - Clickable */}
-                        <h3 class="text-xl font-serif font-bold mb-3 leading-tight group-hover:text-info transition-colors">
+                        <h3 class="text-base md:text-lg group-open:text-xl font-serif font-bold mb-2 group-open:mb-3 leading-tight group-hover:text-info transition-colors">
                           <a 
                             href={item.data.url} 
                             target="_blank" 
@@ -809,12 +819,12 @@ const sectionOrder = getSectionOrder(currentMode);
                         </h3>
                         
                         {/* Summary */}
-                        <p class="text-muted text-sm mb-4 flex-grow leading-relaxed line-clamp-3">
+                        <p class="text-muted text-xs group-open:text-sm mb-2 group-open:mb-4 flex-grow leading-relaxed line-clamp-2 group-open:line-clamp-3">
                           {item.data.summary}
                         </p>
                         
                         {/* Actions Row */}
-                        <div class="mt-auto pt-4 flex items-center border-t border-border">
+                        <div class="mt-auto pt-2 group-open:pt-4 flex items-center border-t border-border">
                           <a 
                             href={item.data.url} 
                             target="_blank" 
@@ -929,6 +939,32 @@ const sectionOrder = getSectionOrder(currentMode);
         if (typeof lucide !== 'undefined') {
           setTimeout(() => lucide.createIcons(), 100);
         }
+      })();
+
+      // Handle journalism card expansion - scroll to top of article
+      (function() {
+        const journalismDetails = document.querySelectorAll('.journalism-details');
+        
+        journalismDetails.forEach((details) => {
+          details.addEventListener('toggle', function(e) {
+            if (this.open) {
+              // Wait for the expansion animation to start
+              setTimeout(() => {
+                const article = this.closest('article');
+                if (article) {
+                  const rect = article.getBoundingClientRect();
+                  const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                  const targetScroll = scrollTop + rect.top - 20;
+                  
+                  window.scrollTo({ 
+                    top: targetScroll, 
+                    behavior: 'smooth' 
+                  });
+                }
+              }, 10);
+            }
+          });
+        });
       })();
     </script>
 
