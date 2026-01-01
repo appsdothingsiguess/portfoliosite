@@ -17,6 +17,7 @@ const journalism = defineCollection({
     type: z.enum(['Article', 'Social', 'Video', 'Multimedia']),
     impact: z.string().optional(), // e.g., "15k+ views", "Resulted in inquiry"
     summary: z.string(),
+    featured: z.boolean().default(false), // If true, appears in featured section (first 2 cards)
   })
 });
 
@@ -59,6 +60,7 @@ const leadership = defineCollection({
     })).optional(),
     tags: z.array(z.string()).optional(), // e.g., ["Finances", "Payroll"]
     summary: z.string(),
+    keyDetails: z.array(z.string()).optional(), // Bullet points for key details/achievements
     modes: z.array(z.enum(['research', 'aba', 'business', 'journalism'])).default(['business']),
   })
 });
@@ -78,6 +80,7 @@ const business = defineCollection({
     })).optional(),
     tags: z.array(z.string()).optional(), // e.g., ["E-Commerce", "P&L Management"]
     summary: z.string(),
+    keyDetails: z.array(z.string()).optional(), // Bullet points for key details/achievements
     modes: z.array(z.enum(['research', 'aba', 'business', 'journalism'])).default(['business']),
   })
 });

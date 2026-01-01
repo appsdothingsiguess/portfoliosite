@@ -2,6 +2,99 @@
 
 A professional, employer-facing portfolio website built with **Astro** that dynamically adapts content presentation based on visitor context. The site features a persistent mode system that remembers visitor preferences, intelligent content reordering, and comprehensive filtering capabilities.
 
+---
+
+## 📝 How to Update Content
+
+All content is stored in Markdown files in the `src/content/` directory. Here's how to update each type of content:
+
+### **Hero Section & About Me** (`src/content/modes/`)
+
+Edit the mode-specific files to change hero content and About Me sections:
+- `research.md` - Research mode hero and About Me
+- `aba.md` - ABA mode hero and About Me  
+- `business.md` - Business mode hero and About Me
+- `journalism.md` - Journalism mode hero and About Me
+
+**Fields:**
+- `badgeText` - Badge text shown in hero
+- `badgeColor` - Tailwind color class (e.g., `bg-blue-500`)
+- `title` - Hero title (can include HTML like `<br class="hidden md:block"/>`)
+- `description` - Hero description (one sentence)
+- `aboutMe` - About Me section content (optional, shown below Top Skills)
+
+### **Experience Cards** (`src/content/research/`, `src/content/business/`, `src/content/leadership/`)
+
+Each experience card is a Markdown file. Edit the frontmatter (YAML at the top) to update:
+
+**Research Cards** (`src/content/research/`):
+- `title` - Project title
+- `role` - Your role (e.g., "Research Assistant")
+- `organization` - Institution name
+- `date` or `dateStart`/`dateEnd` - Dates
+- `tools` - Array of tools/skills used
+- `findings` - Array of key findings (shown in "Key Findings" section)
+- `methodology` - Methodology description
+- `metrics` - Array of `{value: "75+", label: "Participants"}` objects
+- `posterUrl` - Path to PDF poster (optional)
+
+**Business Cards** (`src/content/business/`):
+- `organization` - Company name
+- `role` - Your role
+- `dateStart`/`dateEnd` - Dates
+- `summary` - Summary text
+- `tags` - Array of relevant skills
+- `keyDetails` - Array of key details/achievements (shown in "Key Details" section)
+- `metrics` - Array of metric objects
+- `modes` - Array of modes where this appears
+
+**Leadership Cards** (`src/content/leadership/`):
+- Same fields as Business cards
+- `keyDetails` - Array of key details/achievements (shown in "Key Details" section)
+
+**Journalism Cards** (`src/content/journalism/`):
+- `title` - Article/post title
+- `publication` - Publication name
+- `date` - Publication date
+- `url` - Link to article
+- `type` - `Article`, `Social`, `Video`, or `Multimedia`
+- `summary` - Summary text
+
+### **Skills** (`src/content/skills/`)
+
+Edit skill files to update:
+- `name` - Skill name
+- `icon` - Lucide icon name
+- `shortDesc` - Short description
+- `level` - `Beginner`, `Intermediate`, `Advanced`, or `Certified`
+- `since` - Year you started using this skill
+- `order` - Display order (lower numbers appear first)
+- `featured` - `true` to show in Top Skills section
+
+### **Resume Files** (`public/assets/pdfs/`)
+
+Place mode-specific resume PDFs:
+- `Resume-research.pdf` - Research-focused resume
+- `Resume-aba.pdf` - ABA-focused resume
+- `Resume-business.pdf` - Business-focused resume
+
+The site automatically links to the correct resume based on the current mode.
+
+---
+
+## Quick Reference
+
+| Content Type | Location | Key Fields |
+|-------------|----------|------------|
+| Hero/About Me | `src/content/modes/*.md` | `badgeText`, `title`, `description`, `aboutMe` |
+| Research | `src/content/research/*.md` | `title`, `findings[]`, `methodology`, `tools[]` |
+| Business | `src/content/business/*.md` | `organization`, `role`, `keyDetails[]`, `summary` |
+| Leadership | `src/content/leadership/*.md` | `organization`, `role`, `keyDetails[]`, `summary` |
+| Journalism | `src/content/journalism/*.md` | `title`, `publication`, `url`, `type` |
+| Skills | `src/content/skills/*.md` | `name`, `icon`, `level`, `featured` |
+
+**Note:** After editing Markdown files, the dev server will automatically reload. For production, run `npm run build`.
+
 ## What This Site Does
 
 This portfolio website serves as a **credibility artifact** for employers and recruiters, showcasing professional work across multiple domains:

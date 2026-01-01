@@ -52,7 +52,12 @@ const sortedResearch = filteredResearch.sort((a, b) => {
   // #endregion
   return bVal - aVal;
 });
+// Sort journalism: featured first, then by date (newest first)
 const sortedJournalism = filteredJournalism.sort((a, b) => {
+  // Featured items first
+  if (a.data.featured && !b.data.featured) return -1;
+  if (!a.data.featured && b.data.featured) return 1;
+  // Then by date (newest first)
   const aVal = a.data.date.valueOf();
   const bVal = b.data.date.valueOf();
   // #region agent log
@@ -60,6 +65,11 @@ const sortedJournalism = filteredJournalism.sort((a, b) => {
   // #endregion
   return bVal - aVal;
 });
+
+// Separate featured and remaining articles
+const featuredJournalism = sortedJournalism.filter(item => item.data.featured).slice(0, 2);
+const featuredIds = new Set(featuredJournalism.map(item => item.id));
+const remainingJournalism = sortedJournalism.filter(item => !featuredIds.has(item.id));
 const sortedLeadership = filteredLeadership.sort((a, b) => b.data.dateStart.valueOf() - a.data.dateStart.valueOf());
 const sortedBusiness = filteredBusiness.sort((a, b) => b.data.dateStart.valueOf() - a.data.dateStart.valueOf());
 // #region agent log
@@ -488,13 +498,28 @@ const sectionOrder = getSectionOrder(currentMode);
                     </div>
                   </summary>
                   <div class="px-6 pb-6 md:px-8 md:pb-8 pt-0 border-t border-border mt-2">
-                    <div class="pt-6">
-                      <div class="text-sm text-[var(--text)] leading-relaxed">
-                        {item.body && (
-                          <div set:html={item.body} />
-                        )}
-                        {!item.body && (
-                          <p>{item.data.summary}</p>
+                    <div class="grid md:grid-cols-2 gap-8 pt-6">
+                      <div>
+                        <h4 class="text-sm font-bold uppercase tracking-wide text-muted mb-3">Overview</h4>
+                        <div class="text-sm text-[var(--text)] leading-relaxed">
+                          {item.body && (
+                            <div set:html={item.body} />
+                          )}
+                          {!item.body && (
+                            <p>{item.data.summary}</p>
+                          )}
+                        </div>
+                      </div>
+                      <div>
+                        {item.data.keyDetails && (
+                          <>
+                            <h4 class="text-sm font-bold uppercase tracking-wide text-muted mb-3">Key Details</h4>
+                            <ul class="list-disc pl-4 space-y-2 text-sm text-[var(--text)]">
+                              {item.data.keyDetails.map((point) => (
+                                <li>{point}</li>
+                              ))}
+                            </ul>
+                          </>
                         )}
                       </div>
                     </div>
@@ -567,13 +592,28 @@ const sectionOrder = getSectionOrder(currentMode);
                     </div>
                   </summary>
                   <div class="px-6 pb-6 md:px-8 md:pb-8 pt-0 border-t border-border mt-2">
-                    <div class="pt-6">
-                      <div class="text-sm text-[var(--text)] leading-relaxed">
-                        {item.body && (
-                          <div set:html={item.body} />
-                        )}
-                        {!item.body && (
-                          <p>{item.data.summary}</p>
+                    <div class="grid md:grid-cols-2 gap-8 pt-6">
+                      <div>
+                        <h4 class="text-sm font-bold uppercase tracking-wide text-muted mb-3">Overview</h4>
+                        <div class="text-sm text-[var(--text)] leading-relaxed">
+                          {item.body && (
+                            <div set:html={item.body} />
+                          )}
+                          {!item.body && (
+                            <p>{item.data.summary}</p>
+                          )}
+                        </div>
+                      </div>
+                      <div>
+                        {item.data.keyDetails && (
+                          <>
+                            <h4 class="text-sm font-bold uppercase tracking-wide text-muted mb-3">Key Details</h4>
+                            <ul class="list-disc pl-4 space-y-2 text-sm text-[var(--text)]">
+                              {item.data.keyDetails.map((point) => (
+                                <li>{point}</li>
+                              ))}
+                            </ul>
+                          </>
                         )}
                       </div>
                     </div>
@@ -611,9 +651,9 @@ const sectionOrder = getSectionOrder(currentMode);
           </div>
         </div>
 
-        {/* First 3 cards - Always visible */}
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="journalism-grid-featured">
-          {sortedJournalism.slice(0, 3).map((item, index) => {
+        {/* Featured articles - 2 cards always visible */}
+        <div class="grid md:grid-cols-2 gap-6 mb-6" id="journalism-grid-featured">
+          {featuredJournalism.map((item, index) => {
             // Generate Summary Headline: Prioritize summary over impact, with fallback
             let summaryHeadline = '';
             if (item.data.summary && item.data.summary.trim()) {
@@ -707,20 +747,20 @@ const sectionOrder = getSectionOrder(currentMode);
         </div>
       </div>
 
-      {/* Remaining cards - Expandable section at bottom */}
-      {sortedJournalism.length > 3 && (
-        <details class="group mt-6">
-          <summary class="cursor-pointer list-none">
+      {/* Remaining cards - Expandable section */}
+      {remainingJournalism.length > 0 && (
+        <details class="group" id="journalism-remaining-section">
+          <summary class="cursor-pointer list-none group-open:hidden">
             <div class="flex items-center justify-center gap-2 p-4 bg-surface border border-border rounded-xl hover:bg-surface-2 transition-colors">
-              <i data-lucide="chevron-down" class="w-5 h-5 text-muted group-open:rotate-180 transition-transform"></i>
+              <i data-lucide="chevron-down" class="w-5 h-5 text-muted transition-transform"></i>
               <span class="text-sm font-semibold text-muted">
-                View {sortedJournalism.length - 3} More {sortedJournalism.length - 3 === 1 ? 'Item' : 'Items'}
+                View {remainingJournalism.length} More {remainingJournalism.length === 1 ? 'Item' : 'Items'}
               </span>
             </div>
           </summary>
 
           <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6" id="journalism-grid-remaining">
-            {sortedJournalism.slice(3).map((item, index) => {
+            {remainingJournalism.map((item, index) => {
                 // Generate Summary Headline: Prioritize summary over impact, with fallback
                 let summaryHeadline = '';
                 if (item.data.summary && item.data.summary.trim()) {
@@ -811,6 +851,17 @@ const sectionOrder = getSectionOrder(currentMode);
                   </article>
                 );
               })}
+            </div>
+            
+            {/* Hide Items button at bottom */}
+            <div class="flex items-center justify-center mt-6">
+              <button 
+                onclick="document.getElementById('journalism-remaining-section').removeAttribute('open')"
+                class="flex items-center justify-center gap-2 p-4 bg-surface border border-border rounded-xl hover:bg-surface-2 transition-colors text-sm font-semibold text-muted"
+              >
+                <i data-lucide="chevron-up" class="w-5 h-5"></i>
+                <span>Hide Items</span>
+              </button>
             </div>
           </details>
         )}
