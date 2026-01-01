@@ -1,6 +1,194 @@
 # Portfolio Website
 
-A professional portfolio website built with Astro, featuring a mode-based system that allows content to be reordered and presented differently based on URL parameters.
+A professional, employer-facing portfolio website built with **Astro** that dynamically adapts content presentation based on visitor context. The site features a persistent mode system that remembers visitor preferences, intelligent content reordering, and comprehensive filtering capabilities.
+
+## What This Site Does
+
+This portfolio website serves as a **credibility artifact** for employers and recruiters, showcasing professional work across multiple domains:
+
+- **Research & Psychology** - Experimental design, data analysis, and academic research
+- **Applied Behavior Analysis (ABA)** - Clinical research and RBT qualifications
+- **Business & Operations** - E-commerce operations, leadership, and business development
+- **Journalism & Media** - Investigative reporting, articles, and multimedia content
+
+The site uses a **mode-based system** that allows the same content to be reordered and emphasized differently based on the visitor's context (recruiter type), while maintaining all content visible at all times. This ensures recruiters see the most relevant information first without hiding any professional experience.
+
+---
+
+## Key Features
+
+### 1. Persistent Mode System (Sticky Mode)
+
+The site remembers visitor preferences across sessions using `localStorage`, creating a personalized experience:
+
+- **URL Parameter Capture**: Visiting with `?a`, `?r`, `?b`, or `?j` sets and saves the mode preference
+- **Automatic Recall**: On subsequent visits (without URL params), the site automatically applies the saved mode
+- **Clean URLs**: Query parameters are removed after capture for cleaner URLs
+- **Default Fallback**: If no preference is saved, defaults to ABA mode
+
+**How It Works:**
+1. **Capture Phase**: URL params (`?a`, `?r`, `?j`, `?b`) are detected and saved to `localStorage`
+2. **Recall Phase**: If no URL param exists, checks `localStorage` for saved preference
+3. **Render Phase**: Applies the determined mode immediately to minimize FOUC (Flash of Unstyled Content)
+
+### 2. Dynamic Navigation
+
+- **Sticky Header**: Navigation bar stays visible while scrolling
+- **Mode Dropdown**: Quick access to switch between portfolio modes (ABA, Research, Business, Journalism)
+- **Visual Feedback**: Dropdown button shows current mode with icon and label
+- **Keyboard Accessible**: Full keyboard navigation support with proper ARIA attributes
+- **LinkedIn Integration**: Direct link to LinkedIn profile in navigation
+
+### 3. Adaptive Hero Section
+
+The hero section dynamically updates based on the current mode:
+
+- **Mode-Specific Content**: Badge text, title, and description change per mode
+- **Editable via Markdown**: Hero content is stored in `src/content/modes/` for easy editing
+- **Responsive Design**: Title includes responsive line breaks for optimal mobile/desktop display
+- **Call-to-Action Buttons**: Resume download and LinkedIn connection links
+- **Profile Image**: Professional headshot with "Open to Work" badge
+
+### 4. Top Skills Section
+
+A featured skills section that adapts to the current mode:
+
+- **Mode-Filtered Display**: Shows 5 most relevant skills for the current mode
+- **Dual Assignment Methods**:
+  - **Explicit**: Skills can be assigned to modes via `modes` field
+  - **Relational**: Skills automatically appear when linked to experience files via `tools`/`tags`
+- **Skill Cards**: Each skill displays:
+  - Icon (Lucide icons)
+  - Name and short description
+  - Proficiency level (Beginner, Intermediate, Advanced, Certified)
+  - Featured badge (if applicable)
+- **Client-Side Filtering**: Skills update instantly when mode changes without page reload
+
+### 5. Research & Psychology Section
+
+Comprehensive display of research projects and academic work:
+
+- **Expandable Cards**: Each research entry uses `<details>` for collapsible full content
+- **Key Information Display**:
+  - Project title and organization
+  - Date range or publication date
+  - Methodology summary
+  - Key findings (bulleted list)
+  - Relevant tools/skills (as pills)
+  - Metrics (if available)
+- **Poster Modal**: Click to view research posters in a full-screen modal with PDF viewer
+- **Sorting**: Automatically sorted by date (newest first)
+- **No Filtering**: All research entries are always visible (reordering only)
+
+### 6. Business Ventures Section
+
+Showcases business operations and entrepreneurial experience:
+
+- **Expandable Details**: Full information available via collapsible sections
+- **Key Metrics Display**: Business metrics (revenue, growth, etc.) shown prominently
+- **Tags & Skills**: Relevant skills displayed as pills
+- **Date Ranges**: Clear start/end dates for each role
+- **Summary Headlines**: First sentence of summary shown in collapsed view
+
+### 7. Leadership Section
+
+Displays leadership roles and operational positions:
+
+- **Mode-Specific Display**: Some leadership roles appear in journalism section when relevant
+- **Expandable Cards**: Full details available on click
+- **Metrics**: Key performance indicators displayed when available
+- **Tags**: Skills and competencies shown as pills
+- **Date Tracking**: Start and end dates for each position
+
+### 8. Journalism & Media Section
+
+Comprehensive journalism portfolio with advanced filtering:
+
+- **Featured Display**: First 3 journalism items always visible
+- **Expandable Section**: Remaining items in collapsible "View X More Items" section
+- **Content Filtering**: Filter buttons for:
+  - All Content
+  - Articles only
+  - Social Media only
+- **Dynamic Filtering**: Filter updates both featured and remaining sections
+- **Item Types**: Supports Articles, Social Media posts, Videos, and Multimedia
+- **External Links**: Direct links to published articles and posts
+- **Publication Badges**: Visual indicators for article vs. social media content
+- **Year Display**: Publication year shown on each card
+
+### 9. Technical Toolkit Section
+
+Complete skills inventory:
+
+- **Comprehensive List**: All skills displayed regardless of mode
+- **Categorized Display**: Skills organized by type and proficiency
+- **Icon-Based**: Visual icons for quick scanning
+- **Level Indicators**: Clear proficiency levels (Beginner, Intermediate, Advanced, Certified)
+- **Featured Badges**: Highlights skills marked as featured
+- **Sortable**: Skills can be manually ordered via `order` field
+
+### 10. Contact Section
+
+Professional contact and connection options:
+
+- **Clear CTA**: "Let's Connect" messaging
+- **LinkedIn Integration**: Direct link to LinkedIn profile
+- **Resume Download**: Link to downloadable PDF resume
+- **Footer**: Copyright and technology credits
+
+### 11. Research Poster Modal
+
+Full-screen modal for viewing research posters:
+
+- **PDF Viewer**: Embedded PDF viewer for research posters
+- **Download Option**: Direct download link for PDFs
+- **Responsive Design**: Adapts to different screen sizes
+- **Keyboard Accessible**: Can be closed with Escape key
+- **Loading State**: Shows placeholder while PDF loads
+
+### 12. Responsive Design
+
+Fully responsive across all device sizes:
+
+- **Mobile-First**: Optimized for mobile viewing
+- **Breakpoints**: Tailwind CSS breakpoints (sm, md, lg)
+- **Flexible Grids**: Content grids adapt from 1 to 3 columns based on screen size
+- **Touch-Friendly**: Large tap targets for mobile interaction
+- **Readable Typography**: Font sizes scale appropriately
+
+### 13. Accessibility Features
+
+Built with accessibility as a priority:
+
+- **Semantic HTML**: Proper use of HTML5 semantic elements
+- **Keyboard Navigation**: Full keyboard support throughout
+- **Focus Indicators**: Visible focus states for all interactive elements
+- **ARIA Labels**: Proper ARIA attributes for screen readers
+- **Skip Links**: Skip-to-content link for keyboard users
+- **Alt Text**: All images include descriptive alt text
+- **Heading Hierarchy**: Proper h1 → h2 → h3 structure
+
+### 14. Performance Optimizations
+
+Fast loading and efficient rendering:
+
+- **Static Site Generation**: Pre-rendered HTML for instant loading
+- **Minimal JavaScript**: Only essential client-side scripts
+- **Lazy Loading**: Images loaded on demand
+- **CSS Optimization**: Tailwind CSS purged for production
+- **No Blocking Scripts**: All scripts are non-blocking
+
+### 15. Content Management
+
+Easy content editing via Markdown:
+
+- **Content Collections**: Astro's type-safe content collections
+- **Markdown-Based**: All content in easy-to-edit Markdown files
+- **Schema Validation**: Zod schemas ensure content consistency
+- **Type Safety**: TypeScript types generated from content schemas
+- **Hot Reload**: Changes appear immediately in development
+
+---
 
 ## Getting Started
 
@@ -70,22 +258,18 @@ This serves the built site from the `dist/` directory, allowing you to test the 
 
 ---
 
-## Overview
-
-This portfolio website uses a **mode-based system** that allows the same content to be reordered and presented differently based on URL parameters. The system is designed to showcase different aspects of your professional profile (Research, ABA, Business, Journalism) while maintaining all content visible at all times.
-
 ## Mode System Overview
 
-The portfolio supports four modes:
+The portfolio supports four modes, each emphasizing different aspects of professional experience:
 
 - **Research** (`?r`) - Emphasizes research and psychology work
-- **ABA** (`?a`) - Emphasizes Applied Behavior Analysis and clinical support roles
+- **ABA** (`?a`) - Emphasizes Applied Behavior Analysis and clinical support roles (default)
 - **Business** (`?b`) - Emphasizes business operations and leadership
 - **Journalism** (`?j`) - Emphasizes journalism and media work
 
-**Default Mode**: ABA (when no URL parameter is present)
+**Default Mode**: ABA (when no URL parameter is present and no preference is saved)
 
-## URL Parameters
+### How Modes Work
 
 URL parameters control the mode and affect:
 
@@ -96,10 +280,22 @@ URL parameters control the mode and affect:
 
 ### Usage Examples
 
-- `/?r` - Research mode
 - `/?a` - ABA mode (default)
+- `/?r` - Research mode
 - `/?b` - Business mode
 - `/?j` - Journalism mode
+
+### Persistent Mode (Sticky Mode)
+
+When a visitor uses a URL parameter (e.g., `/?r`), the site:
+1. Sets the mode to Research
+2. Saves the preference to `localStorage`
+3. Removes the query parameter from the URL (clean URL)
+4. On future visits (without params), automatically applies the saved mode
+
+This creates a personalized experience where recruiters see their preferred view automatically.
+
+---
 
 ## Content Collections
 
@@ -108,7 +304,7 @@ URL parameters control the mode and affect:
 All experience collections support a `modes` field that determines:
 - Which skills appear in "Top Skills" for that mode
 - Section ordering priority
-- **NOT** which experiences are displayed (all experiences always show)
+- **NOT** which experiences are displayed (all experiences always show)**
 
 #### Research Collection (`src/content/research/`)
 
@@ -287,13 +483,15 @@ description: "Leveraging E-Prime and SPSS to analyze behavioral patterns..."
 
 **Note**: The `title` field can contain HTML (like `<br>` tags) for responsive formatting.
 
+---
+
 ## Skills System
 
 ### Understanding Top Skills vs. Technical Toolkit
 
 The portfolio has two skill display areas:
 
-1. **Top Skills Section** - Featured skills shown prominently at the top
+1. **Top Skills Section** - Featured skills shown prominently at the top (mode-filtered, 5 skills)
 2. **Technical Toolkit Section** - Complete list of all skills organized by category
 
 ### Top Skills Section
@@ -416,6 +614,8 @@ Experience with SPSS for statistical analysis, including regression models, ANOV
 - Ensure `featured: true` for priority skills
 - Check for duplicate order values
 
+---
+
 ## Section Ordering
 
 Sections are reordered based on the current mode:
@@ -449,6 +649,8 @@ Sections are reordered based on the current mode:
 5. Let's Connect
 
 **Note**: "Technical Toolkit & Certifications" and "Let's Connect" always appear at the end, in that order.
+
+---
 
 ## Development Guide
 
@@ -540,6 +742,16 @@ See the [Skills System](#skills-system) section above for complete documentation
    - Top Skills change
    - Sections reorder
    - All experiences remain visible
+   - Mode preference is saved (check `localStorage` in browser DevTools)
+
+### Testing Persistent Mode
+
+1. Visit `/?r` - Should set Research mode and save to localStorage
+2. Refresh page (without URL param) - Should automatically show Research mode
+3. Visit `/?b` - Should override and save Business mode
+4. Clear localStorage and visit without params - Should default to ABA mode
+
+---
 
 ## Key Principles
 
@@ -547,6 +759,11 @@ See the [Skills System](#skills-system) section above for complete documentation
 2. **Relational Skills**: Skills can be derived from experience files, making the system more maintainable
 3. **Editable Hero Content**: Hero section content is stored in markdown files for easy editing
 4. **Consistent Structure**: All modes show the same sections, just in different orders
+5. **Persistent Preferences**: Visitor mode preferences are remembered across sessions
+6. **Accessibility First**: Built with semantic HTML, keyboard navigation, and proper ARIA attributes
+7. **Performance Optimized**: Static generation, minimal JavaScript, lazy loading
+
+---
 
 ## File Structure
 
@@ -558,17 +775,31 @@ portfolio/
 │   │   ├── research/          # Research experiences
 │   │   ├── leadership/        # Leadership experiences
 │   │   ├── business/          # Business experiences
-│   │   ├── journalism/        # Journalism articles
+│   │   ├── journalism/       # Journalism articles
 │   │   ├── skills/            # Skill definitions
 │   │   └── modes/             # Hero content per mode
 │   │       ├── research.md
 │   │       ├── aba.md
 │   │       ├── business.md
 │   │       └── journalism.md
+│   ├── components/
+│   │   ├── TechnicalSkills.astro
+│   │   └── TopSkills.astro
+│   ├── layouts/
+│   │   └── BaseLayout.astro   # Base page layout
 │   └── pages/
 │       └── index.astro        # Main page with mode logic
-└── README.md                  # This file
+├── public/
+│   ├── assets/
+│   │   └── pdfs/              # Resume and research posters
+│   └── Images/                 # Profile images
+├── astro.config.mjs            # Astro configuration
+├── tailwind.config.mjs         # Tailwind CSS configuration
+├── package.json                # Dependencies
+└── README.md                   # This file
 ```
+
+---
 
 ## Troubleshooting
 
@@ -577,12 +808,14 @@ portfolio/
 - Check that the skill slug matches the tool/tag name in experience files
 - Verify the experience file has the current mode in its `modes` field
 - Or explicitly set `modes` in the skill file
+- Ensure `featured: true` is set if you want it to appear in all relevant modes
 
 ### Hero Content Not Changing
 
 - Verify the mode file exists in `src/content/modes/`
 - Check that the file name matches the mode name (e.g., `research.md` for research mode)
 - Ensure the frontmatter fields match the schema
+- Clear browser cache and localStorage if testing persistent mode
 
 ### Sections Not Reordering
 
@@ -590,3 +823,47 @@ portfolio/
 - Verify CSS `order` values are set correctly on section elements
 - Ensure contact section has `data-section-order` attribute
 
+### Persistent Mode Not Working
+
+- Check browser console for JavaScript errors
+- Verify `localStorage` is enabled in browser settings
+- Clear localStorage and test again: `localStorage.clear()` in browser console
+- Ensure URL parameters are being captured correctly (check network tab)
+
+### Journalism Filter Not Working
+
+- Verify journalism items have `data-type` attribute set correctly
+- Check that filter buttons have `data-filter` attributes
+- Ensure JavaScript is enabled in browser
+- Check browser console for errors
+
+---
+
+## Technology Stack
+
+- **Framework**: [Astro](https://astro.build/) 5.16.6 - Static site generator
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/) 3.4.0 - Utility-first CSS framework
+- **Icons**: [Lucide Icons](https://lucide.dev/) - Icon library
+- **Content**: Markdown with frontmatter (Astro Content Collections)
+- **Type Safety**: TypeScript with Zod schema validation
+- **Build Tool**: Vite (via Astro)
+
+---
+
+## License
+
+This project is a personal portfolio website. All content and code are proprietary.
+
+---
+
+## Support
+
+For questions or issues:
+1. Check the [Troubleshooting](#troubleshooting) section above
+2. Review the relevant feature documentation
+3. Check browser console for JavaScript errors
+4. Verify content file schemas match the examples provided
+
+---
+
+**Last Updated**: 2025

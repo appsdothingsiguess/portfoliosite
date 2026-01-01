@@ -1,6 +1,6 @@
 ---
 organization: "Spezz LLC"
-role: "Chief Executive Officer"
+role: "Founder & Operations Manager"
 dateStart: 2020-03-01
 dateEnd: 2025-03-01
 metrics:

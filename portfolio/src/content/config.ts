@@ -108,6 +108,7 @@ const modes = defineCollection({
     badgeColor: z.string(), // e.g., "bg-blue-500"
     title: z.string(), // Can contain HTML like <br class="hidden md:block"/>
     description: z.string(),
+    aboutMe: z.string().optional(), // About Me section content for each mode (optional)
   })
 });
 

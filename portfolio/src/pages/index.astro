@@ -69,10 +69,11 @@ const sortedSkills = (skillsDocs || []).sort((a, b) =>
   (a.data.order || 999) - (b.data.order || 999)
 );
 
-// 4. Hero content based on mode (loaded from modes collection)
-const heroContent: Record<string, { badge: { color: string; text: string }; title: string; description: string }> = {};
+// 4. Hero content and About Me based on mode (loaded from modes collection)
+const heroContent: Record<string, { badge: { color: string; text: string }; title: string; description: string; aboutMe: string }> = {};
+const modeContent: Record<string, { aboutMe: string }> = {};
 
-// Build hero content from modes collection
+// Build hero content and mode content from modes collection
 // #region agent log
 fetch('http://127.0.0.1:7244/ingest/a7ca4eda-4f6b-42fd-97e8-abf86a8386d5',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.astro:44',message:'Before building heroContent',data:{modesDocsLength:modesDocs?.length||0,currentMode},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'B'})}).catch(()=>{});
 // #endregion
@@ -90,8 +91,14 @@ if (modesDocs && modesDocs.length > 0) {
           text: doc.data.badgeText || 'Portfolio' 
         },
         title: doc.data.title || 'Professional Portfolio',
-        description: doc.data.description || 'Welcome to my portfolio.'
+        description: doc.data.description || 'Welcome to my portfolio.',
+        aboutMe: doc.data.aboutMe || ''
       };
+      modeContent[modeKey] = {
+        aboutMe: (doc.data.aboutMe && typeof doc.data.aboutMe === 'string') ? doc.data.aboutMe.trim() : ''
+      };
+      // Debug: Log each mode as it's loaded (always log for troubleshooting)
+      console.log(`[Mode Load] ${modeKey}: aboutMe exists = ${!!doc.data.aboutMe}, length = ${doc.data.aboutMe?.length || 0}, preview = "${doc.data.aboutMe?.substring(0, 60) || 'NONE'}..."`);
       // #region agent log
       fetch('http://127.0.0.1:7244/ingest/a7ca4eda-4f6b-42fd-97e8-abf86a8386d5',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.astro:57',message:'Added to heroContent',data:{docId:doc.id,modeKey,heroContentKeys:Object.keys(heroContent)},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'C'})}).catch(()=>{});
       // #endregion
@@ -106,7 +113,8 @@ fetch('http://127.0.0.1:7244/ingest/a7ca4eda-4f6b-42fd-97e8-abf86a8386d5',{metho
 const defaultHero = {
   badge: { color: 'bg-green-500', text: 'Portfolio' },
   title: 'Professional Portfolio',
-  description: 'Welcome to my portfolio.'
+  description: 'Welcome to my portfolio.',
+  aboutMe: ''
 };
 
 // Get hero content for current mode, with fallback
@@ -116,21 +124,32 @@ if (Object.keys(heroContent).length === 0) {
 }
 
 const currentHero = heroContent[currentMode] || defaultHero;
+const currentModeContent = modeContent[currentMode] ?? { aboutMe: '' };
+
+// Debug: Log current mode and content for troubleshooting
+console.log('[About Me Debug] Current mode:', currentMode);
+console.log('[About Me Debug] Available mode keys:', Object.keys(modeContent));
+console.log('[About Me Debug] All mode content:', modeContent);
+console.log('[About Me Debug] Current mode content for', currentMode, ':', currentModeContent);
+console.log('[About Me Debug] About Me exists:', !!currentModeContent?.aboutMe);
+console.log('[About Me Debug] About Me value (first 100 chars):', currentModeContent?.aboutMe?.substring(0, 100) || 'NONE');
 // #region agent log
 fetch('http://127.0.0.1:7244/ingest/a7ca4eda-4f6b-42fd-97e8-abf86a8386d5',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'index.astro:74',message:'Selected currentHero',data:{currentMode,usingFallback:!(currentMode in heroContent),currentHeroTitle:currentHero.title,currentHeroDescription:currentHero.description},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'E'})}).catch(()=>{});
 // #endregion
 
-// Embed all hero content for client-side mode switching (since static mode doesn't have query params)
+// Embed all hero content and mode content for client-side mode switching (since static mode doesn't have query params)
 const allHeroContent = JSON.stringify(heroContent);
 const defaultHeroJson = JSON.stringify(defaultHero);
+const allModeContent = JSON.stringify(modeContent);
 
 // 5. Determine section order based on mode (always ends with skills and contact)
+// Note: Top Skills and About Me are always first (handled separately in HTML)
 function getSectionOrder(mode: typeof currentMode): string[] {
   const baseOrder = {
-    research: ['research', 'business', 'leadership', 'journalism'],
-    business: ['business', 'leadership', 'journalism', 'research'],
-    aba: ['research', 'business', 'leadership', 'journalism'],
-    journalism: ['journalism', 'research', 'business', 'leadership']
+    research: ['research', 'journalism', 'business'], // Research → Leadership & Operations → Business
+    business: ['business', 'journalism', 'research'], // Business → Leadership & Operations → Research
+    aba: ['research', 'journalism', 'business'], // Research → Leadership & Operations → Business
+    journalism: ['journalism', 'research', 'business'] // Journalism → Research → Business
   };
   return [...baseOrder[mode], 'skills', 'contact'];
 }
@@ -231,7 +250,7 @@ const sectionOrder = getSectionOrder(currentMode);
         </p>
 
         <div class="flex flex-wrap justify-center md:justify-start gap-4">
-          <a href="/assets/pdfs/Resume.pdf" target="_blank" class="btn-secondary px-6 py-3 rounded-xl inline-flex items-center gap-2">
+          <a id="resume-link" href={`/assets/pdfs/Resume-${currentMode}.pdf`} target="_blank" class="btn-secondary px-6 py-3 rounded-xl inline-flex items-center gap-2">
             <i data-lucide="file-text" class="w-4 h-4"></i> Download Resume
           </a>
           <a href="https://www.linkedin.com/in/joseph-abboud-a870533a3/" target="_blank" class="btn-primary px-6 py-3 rounded-xl inline-flex items-center gap-2">
@@ -275,6 +294,19 @@ const sectionOrder = getSectionOrder(currentMode);
       [data-section-order="998"] { order: 998; }
       [data-section-order="999"] { order: 999; }
     </style>
+
+    <!-- About Me Section - Dynamic per mode (appears after hero, before Top Skills) -->
+    <section id="about" class="scroll-mt-24 mb-10" style:display={currentModeContent?.aboutMe && currentModeContent.aboutMe.trim().length > 0 ? 'block' : 'none'}>
+      <div class="card p-6 md:p-8">
+        <h2 class="text-2xl font-serif font-bold mb-4 flex items-center gap-2">
+          <i data-lucide="user" class="w-5 h-5 text-muted"></i>
+          About Me
+        </h2>
+        <div class="prose prose-sm max-w-none text-muted leading-relaxed">
+          <p id="about-me-content" set:html={currentModeContent?.aboutMe || ''}></p>
+        </div>
+      </div>
+    </section>
 
     <!-- Section: Top Skills (Featured Skills) -->
     <!-- 
@@ -481,7 +513,7 @@ const sectionOrder = getSectionOrder(currentMode);
         <div>
           <h2 class="text-3xl font-serif font-bold mb-2 flex items-center gap-2">
             <i data-lucide="newspaper" class="w-6 h-6 text-muted"></i>
-            Journalism & Media
+            Leadership & Operations
           </h2>
           <p class="text-muted max-w-lg">Investigative reporting and multimedia content.</p>
         </div>
@@ -1001,10 +1033,11 @@ const sectionOrder = getSectionOrder(currentMode);
     // #endregion
   </script>
 
-  <!-- Embed hero content data for client-side mode switching -->
-  <script is:inline define:vars={{allHeroContent, defaultHeroJson}}>
+  <!-- Embed hero content and mode content data for client-side mode switching -->
+  <script is:inline define:vars={{allHeroContent, defaultHeroJson, allModeContent}}>
     window.portfolioHeroContent = JSON.parse(allHeroContent);
     window.portfolioDefaultHero = JSON.parse(defaultHeroJson);
+    window.portfolioModeContent = JSON.parse(allModeContent);
   </script>
 
   <!-- Sticky Chameleon Script -->
@@ -1092,19 +1125,40 @@ const sectionOrder = getSectionOrder(currentMode);
       if (descEl && hero.description) {
         descEl.textContent = hero.description;
       }
+      
+      // Update resume link
+      const resumeLink = document.getElementById('resume-link');
+      if (resumeLink) {
+        resumeLink.href = `/assets/pdfs/Resume-${mode}.pdf`;
+      }
+      
+      // Update About Me section
+      const aboutSection = document.getElementById('about');
+      const aboutContent = document.getElementById('about-me-content');
+      const modeContentData = window.portfolioModeContent || {};
+      const currentModeData = modeContentData[mode] || { aboutMe: '' };
+      
+      if (aboutSection && aboutContent) {
+        if (currentModeData.aboutMe) {
+          aboutContent.textContent = currentModeData.aboutMe;
+          aboutSection.style.display = '';
+        } else {
+          aboutSection.style.display = 'none';
+        }
+      }
     }
 
     // Update section ordering based on mode
     function updateSectionOrder(mode) {
       const sectionOrder = {
-        research: ['research', 'business', 'leadership', 'journalism'],
-        business: ['business', 'leadership', 'journalism', 'research'],
-        aba: ['research', 'business', 'leadership', 'journalism'],
-        journalism: ['journalism', 'research', 'business', 'leadership']
+        research: ['research', 'journalism', 'business'], // Research → Leadership & Operations → Business
+        business: ['business', 'journalism', 'research'], // Business → Leadership & Operations → Research
+        aba: ['research', 'journalism', 'business'], // Research → Leadership & Operations → Business
+        journalism: ['journalism', 'research', 'business'] // Journalism → Research → Business
       };
       
       const order = sectionOrder[mode] || sectionOrder['aba'];
-      const sections = ['research', 'business', 'leadership', 'journalism'];
+      const sections = ['research', 'business', 'journalism']; // Note: 'journalism' section is the Leadership & Operations section
       
       sections.forEach((sectionId) => {
         const section = document.getElementById(sectionId);
