@@ -13,7 +13,7 @@ metrics:
     label: "Data Integrity"
   - value: "1 Successful"
     label: "Conference Presentation"
-tools: ["eprime-design", "spss-analysis", "jasp", "data-collection", "experimental-research", "research-skills"]
+tools: ["SPSS Analysis", "E-Prime Design", "JASP", "IRB Compliance", "Data Collection", "Experimental Research", "Qualtrics", "Clinical Research"]
 posterUrl: "/assets/pdfs/wpa-2025-poster.pdf"
 modes: ["research", "aba"]
 methodology: "Collaborated with a multidisciplinary research team to design and execute the S.M.A.R.T. psychological research experiment, supporting recruitment and data collection for 75+ participants. Designed, programmed, and administered experimental protocols using E-Prime, ensuring precise stimulus timing, response logging, and experimental control."

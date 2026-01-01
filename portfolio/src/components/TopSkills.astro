@@ -8,77 +8,61 @@ interface Props {
 
 const { currentMode = 'research' } = Astro.props;
 
+// Hardcoded mapping of mode -> skill names (exactly 5 skills per mode)
+const topSkillsByMode: Record<string, string[]> = {
+  'aba': ['Data Collection', 'Clinical Research', 'Psychology Education', 'Operational Discipline', 'Collaborative Problem Solving'],
+  'research': ['SPSS Analysis', 'E-Prime Design', 'JASP', 'IRB Compliance', 'Experimental Research'],
+  'business': ['Budget / P&L', 'Sales Management', 'Supply Chain', 'E-Commerce', 'Hiring & Mgmt'],
+  'journalism': ['AP Style', 'Investigative Reporting', 'Technical Writing', 'Analytical Writing', 'WordPress']
+};
+
 // 1. Fetch all skills
 const allSkills = await getCollection('skills');
 
-// 2. Get ALL skills with explicit modes (render all, filter client-side for reactivity)
-// This allows client-side mode switching without re-rendering
-const skillsWithModes = allSkills.filter((skill) => {
-  return skill.data.modes && skill.data.modes.length > 0;
+// 2. Get the 5 skills for the current mode (render all modes for client-side switching)
+// Create a map of all skills by name for quick lookup
+const skillsByName = new Map<string, typeof allSkills[0]>();
+allSkills.forEach(skill => {
+  skillsByName.set(skill.data.name, skill);
 });
 
-// Get skills without explicit modes (will use relational logic for initial render only)
-const skillsWithoutModes = allSkills.filter(skill => !skill.data.modes || skill.data.modes.length === 0);
+// 3. Build renderable skills: include all skills from all modes (for client-side filtering)
+const allRenderableSkills: typeof allSkills = [];
+const modeToSkillsMap: Record<string, typeof allSkills> = {};
 
-// For skills without modes, use relational matching for the initial currentMode
-let relationallyMatched: typeof allSkills = [];
-if (skillsWithoutModes.length > 0) {
-    // Determine context and fetch experience documents for relational matching
-    let experienceDocs: Array<CollectionEntry<'research'>> | Array<CollectionEntry<'leadership'>> | Array<CollectionEntry<'business'>> | Array<CollectionEntry<'journalism'>> = [];
-
-    if (currentMode === 'research' || currentMode === 'aba') {
-      experienceDocs = await getCollection('research');
-    } else if (currentMode === 'business') {
-      const leadershipDocs = await getCollection('leadership');
-      const businessDocs = await getCollection('business');
-      experienceDocs = [...leadershipDocs, ...businessDocs] as Array<CollectionEntry<'leadership'>>;
-    } else if (currentMode === 'journalism') {
-      experienceDocs = await getCollection('journalism');
+// For each mode, get the corresponding skills
+Object.entries(topSkillsByMode).forEach(([mode, skillNames]) => {
+  const modeSkills: typeof allSkills = [];
+  skillNames.forEach(skillName => {
+    const skill = skillsByName.get(skillName);
+    if (skill) {
+      modeSkills.push(skill);
+      // Add to allRenderableSkills if not already added
+      if (!allRenderableSkills.find(s => s.id === skill.id)) {
+        allRenderableSkills.push(skill);
+      }
     }
-
-    const usedSkillIds = new Set<string>();
-    experienceDocs.forEach((doc) => {
-      if (currentMode === 'research' || currentMode === 'aba') {
-        const researchDoc = doc as CollectionEntry<'research'>;
-        researchDoc.data.tools?.forEach((tool) => {
-          usedSkillIds.add(tool);
-          const normalized = tool.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-          usedSkillIds.add(normalized);
-        });
-      } else if (currentMode === 'business') {
-        if ('organization' in doc.data && 'tags' in doc.data) {
-          const tags = doc.data.tags;
-          tags?.forEach((tag) => {
-            usedSkillIds.add(tag);
-            const normalized = tag.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-            usedSkillIds.add(normalized);
-          });
-        }
-      }
-    });
-
-    relationallyMatched = skillsWithoutModes.filter((skill) => {
-      const skillId = skill.id;
-      if (usedSkillIds.has(skillId)) return true;
-      for (const usedId of usedSkillIds) {
-        if (skillId.includes(usedId) || usedId.includes(skillId)) return true;
-        const normalizedSkillName = skill.data.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-        if (normalizedSkillName.includes(usedId) || usedId.includes(normalizedSkillName)) return true;
-      }
-      return false;
-    });
-}
-
-// 3. Combine all skills that should be rendered (all with modes + relationally matched for initial mode)
-// Client-side script will filter by mode
-const allRenderableSkills = [...skillsWithModes, ...relationallyMatched];
-
-// 4. Sort: featured skills first, then by order
-const sortedSkills = allRenderableSkills.sort((a, b) => {
-  if (a.data.featured && !b.data.featured) return -1;
-  if (!a.data.featured && b.data.featured) return 1;
-  return (a.data.order || 999) - (b.data.order || 999);
+  });
+  modeToSkillsMap[mode] = modeSkills;
 });
+
+// 4. Sort: maintain order as defined in topSkillsByMode
+const sortedSkills = allRenderableSkills.sort((a, b) => {
+  // Get the order from the mode arrays
+  const getOrder = (skill: typeof allSkills[0], mode: string): number => {
+    const skillNames = topSkillsByMode[mode] || [];
+    const index = skillNames.indexOf(skill.data.name);
+    return index >= 0 ? index : 999;
+  };
+  
+  // For current mode, use its order; otherwise use first mode that contains the skill
+  const aOrder = getOrder(a, currentMode);
+  const bOrder = getOrder(b, currentMode);
+  return aOrder - bOrder;
+});
+
+// Serialize topSkillsByMode for client-side script
+const topSkillsByModeJson = JSON.stringify(topSkillsByMode);
 
 ---
 
@@ -105,8 +89,13 @@ const sortedSkills = allRenderableSkills.sort((a, b) => {
       </div>
     ) : (
       sortedSkills.map((skill) => {
-        // Determine which modes this skill should appear in
-        const skillModes = skill.data.modes || [];
+        // Determine which modes this skill should appear in (from hardcoded mapping)
+        const skillModes: string[] = [];
+        Object.entries(topSkillsByMode).forEach(([mode, skillNames]) => {
+          if (skillNames.includes(skill.data.name)) {
+            skillModes.push(mode);
+          }
+        });
         // Create a data attribute with all modes this skill belongs to
         const modesAttr = skillModes.join(',');
         return (
@@ -114,6 +103,7 @@ const sortedSkills = allRenderableSkills.sort((a, b) => {
             class="card p-6 hover:scale-[1.02] transition-all duration-200 top-skill-card"
             data-order={skill.data.order || 999}
             data-modes={modesAttr}
+            data-skill-name={skill.data.name}
           >
             <div class="flex items-start gap-4">
               <div class="flex-shrink-0 bg-surface-2 p-3 rounded-xl border border-border">
@@ -155,9 +145,12 @@ const sortedSkills = allRenderableSkills.sort((a, b) => {
   </div>
 </section>
 
-<script is:inline>
+<script is:inline define:vars={{topSkillsByModeJson}}>
   // Client-side mode switching for Top Skills
   (function() {
+    // Hardcoded mapping (same as server-side)
+    const topSkillsMap = JSON.parse(topSkillsByModeJson);
+    
     function updateTopSkillsForMode(mode) {
       const grid = document.getElementById('top-skills-grid');
       const section = document.getElementById('top-skills');
@@ -168,28 +161,24 @@ const sortedSkills = allRenderableSkills.sort((a, b) => {
       const cards = grid.querySelectorAll('.top-skill-card');
       let visibleCount = 0;
       
+      // Get the 5 skills for this mode
+      const modeSkillNames = topSkillsMap[mode] || [];
+      
       // Update description
       if (description) {
         const modeLabel = mode === 'aba' ? 'ABA/Research' : mode;
         description.textContent = 'Core competencies for ' + modeLabel + ' roles.';
       }
       
-      // Show/hide cards based on modes attribute
+      // Show/hide cards based on whether they're in the mode's skill list
       cards.forEach(function(card) {
-        const modesAttr = card.getAttribute('data-modes');
-        if (modesAttr && modesAttr.trim()) {
-          const skillModes = modesAttr.split(',').map(m => m.trim()).filter(m => m);
-          const shouldShow = skillModes.includes(mode);
-          
-          if (shouldShow) {
-            card.style.display = '';
-            visibleCount++;
-          } else {
-            card.style.display = 'none';
-          }
+        const skillName = card.getAttribute('data-skill-name');
+        const shouldShow = skillName && modeSkillNames.includes(skillName);
+        
+        if (shouldShow) {
+          card.style.display = '';
+          visibleCount++;
         } else {
-          // Skills without modes attribute are relationally matched - hide them on mode change
-          // They should only show for the initial mode they were matched for
           card.style.display = 'none';
         }
       });
@@ -221,20 +210,6 @@ const sortedSkills = allRenderableSkills.sort((a, b) => {
         
         // Initial update based on data-mode attribute
         const initialMode = container.getAttribute('data-mode') || 'aba';
-        // Set initial visibility - skills matching current mode are visible, others hidden
-        const grid = document.getElementById('top-skills-grid');
-        if (grid) {
-          const cards = grid.querySelectorAll('.top-skill-card');
-          cards.forEach(function(card) {
-            const modesAttr = card.getAttribute('data-modes');
-            if (modesAttr && modesAttr.trim()) {
-              const skillModes = modesAttr.split(',').map(m => m.trim()).filter(m => m);
-              if (!skillModes.includes(initialMode)) {
-                card.style.display = 'none';
-              }
-            }
-          });
-        }
         updateTopSkillsForMode(initialMode);
       }
     }
