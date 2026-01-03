@@ -171,25 +171,26 @@ const sectionOrder = getSectionOrder(currentMode);
   
   <!-- Navigation -->
   <nav class="sticky top-0 z-50 border-b border-border bg-surface/95 backdrop-blur-md">
-    <div class="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
+    <div class="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between relative">
       <a href="./" class="font-serif font-bold text-xl tracking-tight">Joseph Abboud</a>
       
-      <div class="flex items-center gap-3">
+      <!-- Desktop Navigation (hidden on mobile) -->
+      <div class="hidden md:flex items-center gap-3">
         <!-- Mode Dropdown -->
         <div class="relative" id="mode-dropdown">
           <button 
             id="mode-dropdown-button"
-            class="btn-secondary px-3 py-2 rounded-lg text-xs font-semibold inline-flex items-center gap-2"
+            class="btn-secondary px-3 py-2.5 rounded-lg text-xs font-semibold inline-flex items-center gap-2"
             aria-haspopup="true"
             aria-expanded="false"
           >
             <i id="mode-dropdown-icon" data-lucide="microscope" class="w-4 h-4"></i>
             <span id="mode-dropdown-text" class="hidden sm:inline">Research</span>
-            <i data-lucide="chevron-down" class="w-3 h-3 ml-1"></i>
+            <i data-lucide="chevron-down" class="w-4 h-4 sm:w-3 sm:h-3 ml-1"></i>
           </button>
           <div 
             id="mode-dropdown-menu"
-            class="hidden absolute right-0 mt-2 w-48 rounded-lg border border-border bg-surface shadow-lg z-50"
+            class="hidden absolute right-0 mt-2 w-48 max-w-[calc(100vw-2rem)] rounded-lg border border-border bg-surface shadow-lg z-50"
             role="menu"
           >
             <a 
@@ -234,9 +235,99 @@ const sectionOrder = getSectionOrder(currentMode);
             </a>
           </div>
         </div>
-        <a href="https://www.linkedin.com/in/joseph-abboud-a870533a3/" target="_blank" class="btn-primary px-3 py-2 rounded-lg text-xs font-semibold inline-flex items-center gap-2">
+        <a href="https://www.linkedin.com/in/joseph-abboud-a870533a3/" target="_blank" class="btn-primary px-3 py-2.5 rounded-lg text-xs font-semibold inline-flex items-center gap-2">
           <i data-lucide="linkedin" class="w-4 h-4"></i>
           <span class="hidden sm:inline">Connect</span>
+        </a>
+      </div>
+
+      <!-- Mobile Hamburger Button -->
+      <button 
+        id="mobile-menu-toggle"
+        class="md:hidden p-3 rounded-lg hover:bg-surface-2 transition-colors focus-visible:outline focus-visible:outline-3 focus-visible:outline-[var(--focus)] focus-visible:outline-offset-2"
+        aria-label="Toggle mobile menu"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+      >
+        <i id="mobile-menu-icon" data-lucide="menu" class="w-6 h-6"></i>
+      </button>
+    </div>
+
+    <!-- Mobile Menu Dropdown -->
+    <div 
+      id="mobile-menu"
+      class="hidden absolute top-16 left-0 right-0 bg-surface border-b border-border shadow-xl z-40"
+    >
+      <div class="max-w-5xl mx-auto px-6 py-4 flex flex-col gap-3">
+        <!-- Mode Dropdown for Mobile -->
+        <div class="relative" id="mobile-mode-dropdown">
+          <button 
+            id="mobile-mode-dropdown-button"
+            class="w-full btn-secondary px-4 py-3 rounded-lg text-sm font-semibold inline-flex items-center justify-between"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
+            <div class="flex items-center gap-2">
+              <i id="mobile-mode-dropdown-icon" data-lucide="microscope" class="w-4 h-4"></i>
+              <span id="mobile-mode-dropdown-text">Research</span>
+            </div>
+            <i data-lucide="chevron-down" class="w-4 h-4"></i>
+          </button>
+          <div 
+            id="mobile-mode-dropdown-menu"
+            class="hidden mt-2 rounded-lg border border-border bg-surface shadow-lg"
+            role="menu"
+          >
+            <a 
+              href="?a" 
+              class="mode-option block px-4 py-3 text-sm hover:bg-surface-2 transition-colors flex items-center gap-2 border-b border-border first:rounded-t-lg last:rounded-b-lg"
+              data-mode="aba"
+              data-icon="target"
+              data-label="ABA"
+            >
+              <i data-lucide="target" class="w-4 h-4"></i>
+              <span>ABA / RBT</span>
+            </a>
+            <a 
+              href="?r" 
+              class="mode-option block px-4 py-3 text-sm hover:bg-surface-2 transition-colors flex items-center gap-2 border-b border-border first:rounded-t-lg last:rounded-b-lg"
+              data-mode="research"
+              data-icon="microscope"
+              data-label="Research"
+            >
+              <i data-lucide="microscope" class="w-4 h-4"></i>
+              <span>Research</span>
+            </a>
+            <a 
+              href="?b" 
+              class="mode-option block px-4 py-3 text-sm hover:bg-surface-2 transition-colors flex items-center gap-2 border-b border-border first:rounded-t-lg last:rounded-b-lg"
+              data-mode="business"
+              data-icon="briefcase"
+              data-label="Business"
+            >
+              <i data-lucide="briefcase" class="w-4 h-4"></i>
+              <span>Business</span>
+            </a>
+            <a 
+              href="?j" 
+              class="mode-option block px-4 py-3 text-sm hover:bg-surface-2 transition-colors flex items-center gap-2 first:rounded-t-lg last:rounded-b-lg"
+              data-mode="journalism"
+              data-icon="pen-tool"
+              data-label="Journalism"
+            >
+              <i data-lucide="pen-tool" class="w-4 h-4"></i>
+              <span>Journalism</span>
+            </a>
+          </div>
+        </div>
+        <!-- Connect Button for Mobile -->
+        <a 
+          href="https://www.linkedin.com/in/joseph-abboud-a870533a3/" 
+          target="_blank" 
+          class="w-full btn-primary px-4 py-3 rounded-lg text-sm font-semibold inline-flex items-center justify-center gap-2"
+        >
+          <i data-lucide="linkedin" class="w-4 h-4"></i>
+          <span>Connect on LinkedIn</span>
         </a>
       </div>
     </div>
@@ -333,7 +424,7 @@ const sectionOrder = getSectionOrder(currentMode);
     <section id="research" data-section-order={sectionOrder.indexOf('research')} class="scroll-mt-24 transition-colors duration-1000 p-4 -m-4 rounded-2xl">
       <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
         <div>
-          <h2 class="text-3xl font-serif font-bold mb-2 flex items-center gap-2">
+          <h2 class="text-2xl md:text-3xl font-serif font-bold mb-2 flex items-center gap-2">
             <i data-lucide="microscope" class="w-6 h-6 text-muted"></i>
             Research & Psychology
           </h2>
@@ -386,7 +477,7 @@ const sectionOrder = getSectionOrder(currentMode);
                     {summaryHeadline}
                   </p>
                   {item.data.metrics && item.data.metrics.length > 0 && (
-                    <div class="grid grid-cols-3 gap-4 pt-4 mb-4 border-t border-border">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 mb-4 border-t border-border">
                       {item.data.metrics.map((metric) => (
                         <div>
                           <div class="font-bold text-xl text-[var(--text)]">{metric.value}</div>
@@ -448,7 +539,7 @@ const sectionOrder = getSectionOrder(currentMode);
       <section id="business" data-section-order={sectionOrder.indexOf('business')} class="scroll-mt-24 transition-colors duration-1000 p-4 -m-4 rounded-2xl">
         <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
           <div>
-            <h2 class="text-3xl font-serif font-bold mb-2 flex items-center gap-2">
+            <h2 class="text-2xl md:text-3xl font-serif font-bold mb-2 flex items-center gap-2">
               <i data-lucide="briefcase" class="w-6 h-6 text-muted"></i>
               Business Ventures
             </h2>
@@ -489,7 +580,7 @@ const sectionOrder = getSectionOrder(currentMode);
                       {summaryHeadline}
                     </p>
                     {item.data.metrics && item.data.metrics.length > 0 && (
-                      <div class="grid grid-cols-3 gap-4 pt-4 mb-4 border-t border-border">
+                      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 mb-4 border-t border-border">
                         {item.data.metrics.map((metric) => (
                           <div>
                             <div class="font-bold text-xl text-[var(--text)]">{metric.value}</div>
@@ -543,7 +634,7 @@ const sectionOrder = getSectionOrder(currentMode);
     <section id="journalism" data-section-order={sectionOrder.indexOf('journalism')} class="scroll-mt-24 transition-colors duration-1000 p-4 -m-4 rounded-2xl">
       <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
         <div>
-          <h2 class="text-3xl font-serif font-bold mb-2 flex items-center gap-2">
+          <h2 class="text-2xl md:text-3xl font-serif font-bold mb-2 flex items-center gap-2">
             <i data-lucide="newspaper" class="w-6 h-6 text-muted"></i>
             Leadership & Operations
           </h2>
@@ -586,7 +677,7 @@ const sectionOrder = getSectionOrder(currentMode);
                       {summaryHeadline}
                     </p>
                     {item.data.metrics && item.data.metrics.length > 0 && (
-                      <div class="grid grid-cols-3 gap-4 pt-4 mb-4 border-t border-border">
+                      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 mb-4 border-t border-border">
                         {item.data.metrics.map((metric) => (
                           <div>
                             <div class="font-bold text-xl text-[var(--text)]">{metric.value}</div>
@@ -637,24 +728,24 @@ const sectionOrder = getSectionOrder(currentMode);
 
       {/* My Journalism Work - First 3 cards always visible, rest in expandable section */}
       <div class="mb-6">
-        <div class="flex items-center justify-between mb-6">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
           <h3 class="text-xl font-serif font-bold">My Journalism Work</h3>
-          <div class="flex bg-surface border border-border rounded-full p-1" id="journalism-filter">
+          <div class="inline-flex flex-col sm:flex-row gap-2 bg-surface border border-border rounded-xl sm:rounded-full p-2 sm:p-1" id="journalism-filter">
             <button 
               data-filter="all" 
-              class="journalism-filter-btn px-4 py-1.5 rounded-full text-sm font-medium bg-[var(--text)] text-surface transition-all"
+              class="journalism-filter-btn px-4 py-2.5 rounded-full text-sm font-medium bg-[var(--text)] text-surface transition-all min-h-[44px]"
             >
               All Content
             </button>
             <button 
               data-filter="Article" 
-              class="journalism-filter-btn px-4 py-1.5 rounded-full text-sm font-medium text-muted hover:bg-surface-2 transition-all"
+              class="journalism-filter-btn px-4 py-2.5 rounded-full text-sm font-medium text-muted hover:bg-surface-2 transition-all min-h-[44px]"
             >
               Articles
             </button>
             <button 
               data-filter="Social" 
-              class="journalism-filter-btn px-4 py-1.5 rounded-full text-sm font-medium text-muted hover:bg-surface-2 transition-all"
+              class="journalism-filter-btn px-4 py-2.5 rounded-full text-sm font-medium text-muted hover:bg-surface-2 transition-all min-h-[44px]"
             >
               Social Media
             </button>
@@ -687,12 +778,12 @@ const sectionOrder = getSectionOrder(currentMode);
                       <span class={`pill text-xs group-open:text-sm ${item.data.type === 'Article' ? 'bg-blue-50 text-blue-800 border-blue-200' : 'bg-purple-50 text-purple-800 border-purple-200'}`}>
                         {item.data.type === 'Article' ? (
                           <>
-                            <i data-lucide="file-text" class="w-3 h-3"></i>
+                            <i data-lucide="file-text" class="w-4 h-4 sm:w-3 sm:h-3"></i>
                             <span>{item.data.publication || 'Article'}</span>
                           </>
                         ) : (
                           <>
-                            <i data-lucide="instagram" class="w-3 h-3"></i>
+                            <i data-lucide="instagram" class="w-4 h-4 sm:w-3 sm:h-3"></i>
                             <span>{item.data.publication || 'Social'}</span>
                           </>
                         )}
@@ -724,7 +815,7 @@ const sectionOrder = getSectionOrder(currentMode);
                         class="text-xs font-semibold flex items-center gap-1.5 hover:text-info transition-colors"
                       >
                         {item.data.type === 'Article' ? 'Read Article' : 'View Post'} 
-                        <i data-lucide="external-link" class="w-3 h-3"></i>
+                        <i data-lucide="external-link" class="w-4 h-4 sm:w-3 sm:h-3"></i>
                       </a>
                     </div>
                   </summary>
@@ -794,12 +885,12 @@ const sectionOrder = getSectionOrder(currentMode);
                           <span class={`pill text-xs group-open:text-sm ${item.data.type === 'Article' ? 'bg-blue-50 text-blue-800 border-blue-200' : 'bg-purple-50 text-purple-800 border-purple-200'}`}>
                             {item.data.type === 'Article' ? (
                               <>
-                                <i data-lucide="file-text" class="w-3 h-3"></i>
+                                <i data-lucide="file-text" class="w-4 h-4 sm:w-3 sm:h-3"></i>
                                 <span>{item.data.publication || 'Article'}</span>
                               </>
                             ) : (
                               <>
-                                <i data-lucide="instagram" class="w-3 h-3"></i>
+                                <i data-lucide="instagram" class="w-4 h-4 sm:w-3 sm:h-3"></i>
                                 <span>{item.data.publication || 'Social'}</span>
                               </>
                             )}
@@ -831,7 +922,7 @@ const sectionOrder = getSectionOrder(currentMode);
                             class="text-xs font-semibold flex items-center gap-1.5 hover:text-info transition-colors"
                           >
                             {item.data.type === 'Article' ? 'Read Article' : 'View Post'} 
-                            <i data-lucide="external-link" class="w-3 h-3"></i>
+                            <i data-lucide="external-link" class="w-4 h-4 sm:w-3 sm:h-3"></i>
                           </a>
                         </div>
                       </summary>
@@ -920,9 +1011,9 @@ const sectionOrder = getSectionOrder(currentMode);
           filterButtons.forEach((btn) => {
             const filterType = btn.getAttribute('data-filter');
             if (filterType === type) {
-              btn.className = 'journalism-filter-btn px-4 py-1.5 rounded-full text-sm font-medium bg-[var(--text)] text-surface transition-all';
+              btn.className = 'journalism-filter-btn px-4 py-2.5 rounded-full text-sm font-medium bg-[var(--text)] text-surface transition-all min-h-[44px]';
             } else {
-              btn.className = 'journalism-filter-btn px-4 py-1.5 rounded-full text-sm font-medium text-muted hover:bg-surface-2 transition-all';
+              btn.className = 'journalism-filter-btn px-4 py-2.5 rounded-full text-sm font-medium text-muted hover:bg-surface-2 transition-all min-h-[44px]';
             }
           });
         }
@@ -972,7 +1063,7 @@ const sectionOrder = getSectionOrder(currentMode);
     <section id="skills" data-section-order="998" class="scroll-mt-24 transition-colors duration-1000 p-4 -m-4 rounded-2xl">
       <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
         <div>
-          <h2 class="text-3xl font-serif font-bold mb-2 flex items-center gap-2">
+          <h2 class="text-2xl md:text-3xl font-serif font-bold mb-2 flex items-center gap-2">
             <i data-lucide="wrench" class="w-6 h-6 text-muted"></i>
             Technical Toolkit & Certifications
           </h2>
@@ -1005,11 +1096,11 @@ const sectionOrder = getSectionOrder(currentMode);
   </main>
 
   <!-- Poster Modal -->
-  <dialog id="poster-modal" class="backdrop:bg-gray-900/50 p-0 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+  <dialog id="poster-modal" class="backdrop:bg-gray-900/50 p-0 rounded-xl shadow-2xl w-[95%] sm:w-full max-w-4xl mx-auto max-h-[90vh] overflow-hidden">
     <div class="flex flex-col h-full max-h-[90vh] bg-surface">
       <div class="flex-shrink-0 p-4 border-b border-border flex justify-between items-center bg-surface-2">
         <h3 id="poster-modal-title" class="font-bold">Research Poster</h3>
-        <form method="dialog"><button class="p-2 hover:bg-border rounded-full" aria-label="Close"><i data-lucide="x" class="w-5 h-5"></i></button></form>
+        <form method="dialog"><button class="p-3 hover:bg-border rounded-full min-w-[44px] min-h-[44px] flex items-center justify-center" aria-label="Close"><i data-lucide="x" class="w-5 h-5"></i></button></form>
       </div>
       <div class="flex-1 overflow-auto p-4 bg-gray-100 flex justify-center items-start min-h-0">
         <iframe 
@@ -1046,6 +1137,16 @@ const sectionOrder = getSectionOrder(currentMode);
   <!-- Poster Modal Script -->
   <script is:inline>
     function openPosterModal(posterUrl, title) {
+      // Detect mobile devices (screen width < 768px or touch device)
+      const isMobile = window.innerWidth < 768 || ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+      
+      if (isMobile) {
+        // On mobile, open PDF in new tab for better viewing experience
+        window.open(posterUrl, '_blank');
+        return;
+      }
+      
+      // On desktop, use modal
       const modal = document.getElementById('poster-modal');
       const iframe = document.getElementById('poster-iframe');
       const placeholder = document.getElementById('poster-placeholder');
@@ -1274,7 +1375,162 @@ const sectionOrder = getSectionOrder(currentMode);
     updateSectionOrder(currentMode);
     updateTopSkillsMode(currentMode);
 
-    // Mode Dropdown Functionality
+    // Mobile Menu Toggle Functionality
+    (function() {
+      const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+      const mobileMenu = document.getElementById('mobile-menu');
+      const mobileMenuIcon = document.getElementById('mobile-menu-icon');
+      
+      if (!mobileMenuToggle || !mobileMenu || !mobileMenuIcon) return;
+      
+      mobileMenuToggle.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const isOpen = !mobileMenu.classList.contains('hidden');
+        
+        if (isOpen) {
+          mobileMenu.classList.add('hidden');
+          mobileMenuToggle.setAttribute('aria-expanded', 'false');
+          mobileMenuIcon.setAttribute('data-lucide', 'menu');
+        } else {
+          mobileMenu.classList.remove('hidden');
+          mobileMenuToggle.setAttribute('aria-expanded', 'true');
+          mobileMenuIcon.setAttribute('data-lucide', 'x');
+        }
+        
+        // Re-initialize Lucide icons after toggle
+        if (typeof lucide !== 'undefined') {
+          setTimeout(() => lucide.createIcons(), 10);
+        }
+      });
+      
+      // Close mobile menu when clicking outside
+      document.addEventListener('click', function(e) {
+        const nav = document.querySelector('nav');
+        if (nav && !nav.contains(e.target) && !mobileMenu.classList.contains('hidden')) {
+          mobileMenu.classList.add('hidden');
+          mobileMenuToggle.setAttribute('aria-expanded', 'false');
+          mobileMenuIcon.setAttribute('data-lucide', 'menu');
+          if (typeof lucide !== 'undefined') {
+            setTimeout(() => lucide.createIcons(), 10);
+          }
+        }
+      });
+      
+      // Close mobile menu on Escape key
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && !mobileMenu.classList.contains('hidden')) {
+          mobileMenu.classList.add('hidden');
+          mobileMenuToggle.setAttribute('aria-expanded', 'false');
+          mobileMenuIcon.setAttribute('data-lucide', 'menu');
+          if (typeof lucide !== 'undefined') {
+            setTimeout(() => lucide.createIcons(), 10);
+          }
+        }
+      });
+      
+      // Close mobile menu when a mode option is selected
+      const mobileModeOptions = mobileMenu.querySelectorAll('.mode-option');
+      mobileModeOptions.forEach(option => {
+        option.addEventListener('click', function() {
+          mobileMenu.classList.add('hidden');
+          mobileMenuToggle.setAttribute('aria-expanded', 'false');
+          mobileMenuIcon.setAttribute('data-lucide', 'menu');
+          if (typeof lucide !== 'undefined') {
+            setTimeout(() => lucide.createIcons(), 10);
+          }
+        });
+      });
+      
+      // Close mobile menu when Connect button is clicked
+      const mobileConnectButton = mobileMenu.querySelector('a[href*="linkedin"]');
+      if (mobileConnectButton) {
+        mobileConnectButton.addEventListener('click', function() {
+          mobileMenu.classList.add('hidden');
+          mobileMenuToggle.setAttribute('aria-expanded', 'false');
+          mobileMenuIcon.setAttribute('data-lucide', 'menu');
+          if (typeof lucide !== 'undefined') {
+            setTimeout(() => lucide.createIcons(), 10);
+          }
+        });
+      }
+    })();
+
+    // Mobile Mode Dropdown Functionality
+    (function() {
+      const mobileDropdownButton = document.getElementById('mobile-mode-dropdown-button');
+      const mobileDropdownMenu = document.getElementById('mobile-mode-dropdown-menu');
+      const mobileDropdownIcon = document.getElementById('mobile-mode-dropdown-icon');
+      const mobileDropdownText = document.getElementById('mobile-mode-dropdown-text');
+      
+      if (!mobileDropdownButton || !mobileDropdownMenu) return;
+      
+      // Mode configuration (shared with desktop)
+      const modeConfig = {
+        'aba': { icon: 'target', label: 'ABA / RBT' },
+        'research': { icon: 'microscope', label: 'Research' },
+        'business': { icon: 'briefcase', label: 'Business' },
+        'journalism': { icon: 'pen-tool', label: 'Journalism' }
+      };
+      
+      // Update mobile dropdown button to show current mode
+      function updateMobileDropdownButton(mode) {
+        const config = modeConfig[mode] || modeConfig['aba'];
+        if (mobileDropdownIcon) {
+          mobileDropdownIcon.setAttribute('data-lucide', config.icon);
+          if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+          }
+        }
+        if (mobileDropdownText) {
+          mobileDropdownText.textContent = config.label;
+        }
+        
+        // Update active state in mobile dropdown menu
+        const options = mobileDropdownMenu.querySelectorAll('.mode-option');
+        options.forEach(option => {
+          const optionMode = option.getAttribute('data-mode');
+          if (optionMode === mode) {
+            option.classList.add('bg-surface-2', 'font-semibold');
+          } else {
+            option.classList.remove('bg-surface-2', 'font-semibold');
+          }
+        });
+      }
+      
+      // Toggle mobile dropdown
+      mobileDropdownButton.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const isOpen = !mobileDropdownMenu.classList.contains('hidden');
+        if (isOpen) {
+          mobileDropdownMenu.classList.add('hidden');
+          mobileDropdownButton.setAttribute('aria-expanded', 'false');
+        } else {
+          mobileDropdownMenu.classList.remove('hidden');
+          mobileDropdownButton.setAttribute('aria-expanded', 'true');
+        }
+      });
+      
+      // Close mobile dropdown when clicking outside
+      document.addEventListener('click', function(e) {
+        const mobileDropdown = document.getElementById('mobile-mode-dropdown');
+        if (mobileDropdown && !mobileDropdown.contains(e.target)) {
+          mobileDropdownMenu.classList.add('hidden');
+          mobileDropdownButton.setAttribute('aria-expanded', 'false');
+        }
+      });
+      
+      // Initialize mobile dropdown button with current mode
+      updateMobileDropdownButton(currentMode);
+      
+      // Update mobile dropdown when mode changes
+      window.addEventListener('modechange', function(e) {
+        if (e.detail && e.detail.mode) {
+          updateMobileDropdownButton(e.detail.mode);
+        }
+      });
+    })();
+
+    // Mode Dropdown Functionality (Desktop)
     (function() {
       const dropdownButton = document.getElementById('mode-dropdown-button');
       const dropdownMenu = document.getElementById('mode-dropdown-menu');

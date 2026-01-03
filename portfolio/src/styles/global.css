@@ -82,7 +82,8 @@
 @layer components {
   .btn-primary {
     @apply bg-brand text-brand-ink font-semibold transition-all hover:brightness-95;
-    padding: 10px 14px;
+    padding: 12px 14px;
+    min-height: 44px;
     border-radius: 12px;
     display: inline-flex;
     align-items: center;
@@ -96,7 +97,8 @@
   
   .btn-secondary {
     @apply bg-surface border border-border text-[var(--text)] font-medium transition-all hover:bg-surface-2;
-    padding: 10px 14px;
+    padding: 12px 14px;
+    min-height: 44px;
     border-radius: 12px;
     display: inline-flex;
     align-items: center;
@@ -118,9 +120,28 @@
     @apply bg-surface-2 text-muted text-xs font-semibold px-3 py-1 rounded-full border border-border inline-flex items-center justify-center gap-1;
   }
   
-  /* Tab buttons for journalism section */
+  /* Filter button container - responsive pill group */
+  .filter-button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    padding: 0.5rem;
+  }
+  
+  @media (min-width: 640px) {
+    .filter-button-group {
+      flex-direction: row;
+      border-radius: 9999px;
+      padding: 0.25rem;
+    }
+  }
+  
+  /* Tab buttons / Filter buttons - used in journalism and skills sections */
   .tab-btn {
-    padding: 6px 16px;
+    padding: 10px 16px;
     border-radius: 9999px;
     font-size: 0.875rem;
     font-weight: 500;
@@ -129,6 +150,12 @@
     border: none;
     cursor: pointer;
     transition: all 0.15s ease;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
   
   .tab-btn:hover {

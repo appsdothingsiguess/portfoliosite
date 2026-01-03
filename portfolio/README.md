@@ -239,15 +239,19 @@ Full-screen modal for viewing research posters:
 - **Keyboard Accessible**: Can be closed with Escape key
 - **Loading State**: Shows placeholder while PDF loads
 
-### 12. Responsive Design
+### 12. Responsive Design & Mobile Optimization
 
-Fully responsive across all device sizes:
+Fully responsive across all device sizes with comprehensive mobile optimizations:
 
-- **Mobile-First**: Optimized for mobile viewing
-- **Breakpoints**: Tailwind CSS breakpoints (sm, md, lg)
+- **Mobile-First**: Optimized for mobile viewing with hamburger menu navigation
+- **Breakpoints**: Tailwind CSS breakpoints (sm, md, lg) for adaptive layouts
 - **Flexible Grids**: Content grids adapt from 1 to 3 columns based on screen size
-- **Touch-Friendly**: Large tap targets for mobile interaction
-- **Readable Typography**: Font sizes scale appropriately
+- **Touch-Friendly**: All interactive elements meet WCAG 2.5.5 minimum 44x44px touch targets
+- **Readable Typography**: Fluid typography scaling (e.g., `text-2xl md:text-3xl`) for optimal readability
+- **Mobile Navigation**: Hamburger menu with dropdown overlay for mobile devices
+- **Responsive Filter Buttons**: Filter button groups stack vertically on mobile, horizontal on desktop
+- **Mobile Poster Viewing**: Research posters open in new tab on mobile for better viewing experience
+- **No Horizontal Overflow**: All layouts tested and fixed to prevent horizontal scrolling on < 390px screens
 
 ### 13. Accessibility Features
 

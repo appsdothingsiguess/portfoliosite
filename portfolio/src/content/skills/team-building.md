@@ -4,7 +4,7 @@ icon: "users-round"
 shortDesc: "Fostering effective team dynamics"
 level: "Intermediate"
 since: 2024
-featured: 
+featured: false
 modes: []
 ---
 

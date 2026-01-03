@@ -373,6 +373,24 @@
         </div>
       </div>
 
+      <div class="card-flat p-6">
+        <div class="pill mb-4">Filter Button Group</div>
+        <p class="text-sm text-slate-600 mb-4">
+          Responsive pill-style filter buttons used in Journalism and Skills sections. Stacks vertically on mobile, horizontal on desktop.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-2 bg-surface border border-border rounded-xl sm:rounded-full p-2 sm:p-1" style="border-color: var(--border); background: var(--surface);">
+          <button class="tab-btn active" style="padding: 10px 16px; border-radius: 9999px; font-size: 0.875rem; font-weight: 500; background: var(--text); color: var(--surface); border: none; cursor: pointer; transition: all 0.15s ease; min-height: 44px; display: inline-flex; align-items: center; justify-content: center;">All Content</button>
+          <button class="tab-btn" style="padding: 10px 16px; border-radius: 9999px; font-size: 0.875rem; font-weight: 500; background: transparent; color: var(--muted); border: none; cursor: pointer; transition: all 0.15s ease; min-height: 44px; display: inline-flex; align-items: center; justify-content: center;">Articles</button>
+          <button class="tab-btn" style="padding: 10px 16px; border-radius: 9999px; font-size: 0.875rem; font-weight: 500; background: transparent; color: var(--muted); border: none; cursor: pointer; transition: all 0.15s ease; min-height: 44px; display: inline-flex; align-items: center; justify-content: center;">Social Media</button>
+        </div>
+        <div class="mt-4 space-y-2 text-xs text-slate-600">
+          <p><strong>Container:</strong> <code>flex flex-col sm:flex-row gap-2 bg-surface border border-border rounded-xl sm:rounded-full p-2 sm:p-1</code></p>
+          <p><strong>Buttons:</strong> Use <code>.tab-btn</code> class. Active state: <code>background: var(--text); color: var(--surface)</code></p>
+          <p><strong>Mobile:</strong> Stacks vertically with <code>rounded-xl</code>. Desktop: Horizontal with <code>rounded-full</code>.</p>
+          <p><strong>Touch targets:</strong> Minimum 44px height for WCAG compliance.</p>
+        </div>
+      </div>
+
       <div class="grid md:grid-cols-3 gap-6">
         <div class="stat">
           <div class="kpi">75+</div>
