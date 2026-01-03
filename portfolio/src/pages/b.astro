@@ -1,4 +1,17 @@
 ---
-return Response.redirect(new URL('/?b', Astro.url), 301);
+// Static redirect page - redirects to /?b
+const redirectUrl = new URL('/?b', Astro.url).href;
 ---
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="refresh" content={`0; url=${redirectUrl}`}>
+  <link rel="canonical" href={redirectUrl}>
+  <script is:inline set:html={`window.location.href = ${JSON.stringify(redirectUrl)};`}></script>
+</head>
+<body>
+  <p>Redirecting to <a href={redirectUrl}>homepage</a>...</p>
+</body>
+</html>
 
