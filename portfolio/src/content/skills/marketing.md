@@ -11,3 +11,5 @@ modes: ["business", "journalism"]
 Broad marketing experience including strategy development, campaign execution, and performance tracking. Coordinated marketing initiatives resulting in significant audience growth.
 
 
+
+

@@ -11,3 +11,5 @@ modes: ["business"]
 Experience managing sales operations, developing revenue-sharing structures, and optimizing conversion funnels. Grew e-commerce platform from $0 to $500,000+ in gross profit.
 
 
+
+

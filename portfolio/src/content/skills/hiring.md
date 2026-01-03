@@ -11,3 +11,5 @@ modes: ["business", "journalism"]
 Experience in recruitment processes, candidate evaluation, and hiring decisions. Assisted in hiring processes for management positions and team expansion.
 
 
+
+

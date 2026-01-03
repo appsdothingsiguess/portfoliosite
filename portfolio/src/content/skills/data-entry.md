@@ -11,3 +11,5 @@ modes: ["research", "business"]
 Proficient in accurate data entry, record management, and maintaining data integrity. Applied in research and business contexts requiring precise documentation.
 
 
+
+

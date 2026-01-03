@@ -11,3 +11,5 @@ modes: ["business"]
 Experience with product placement strategies, coordinating product onboarding, and optimizing product positioning for maximum visibility and sales.
 
 
+
+

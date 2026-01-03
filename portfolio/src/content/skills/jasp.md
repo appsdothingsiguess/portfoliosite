@@ -11,3 +11,5 @@ modes: ["research", "aba"]
 Proficient in JASP (Jeffreys's Amazing Statistics Program) for statistical analysis, including Bayesian and frequentist approaches. Used for research data analysis and hypothesis testing.
 
 
+
+

@@ -11,3 +11,5 @@ modes: ["business"]
 Experience managing supply chain operations, coordinating with international vendors, and handling product fulfillment across multiple countries. Ensured efficient logistics and vendor compliance.
 
 
+
+

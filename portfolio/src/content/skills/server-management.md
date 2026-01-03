@@ -11,3 +11,5 @@ modes: ["business"]
 Experience maintaining Linux servers, managing backend infrastructure, and ensuring system reliability. Applied in e-commerce operations requiring 24/7 uptime and performance optimization.
 
 
+
+
