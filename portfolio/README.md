@@ -73,12 +73,13 @@ Edit skill files to update:
 
 ### **Resume Files** (`public/assets/pdfs/`)
 
-Place mode-specific resume PDFs:
+Place mode-specific resume PDFs with the exact naming convention:
+- `Resume-aba.pdf` - ABA/RBT-focused resume (default mode)
 - `Resume-research.pdf` - Research-focused resume
-- `Resume-aba.pdf` - ABA-focused resume
 - `Resume-business.pdf` - Business-focused resume
+- `Resume-journalism.pdf` - Journalism-focused resume
 
-The site automatically links to the correct resume based on the current mode.
+**Important:** File names must match exactly (lowercase mode name with hyphen). The site automatically links to the correct resume based on the current mode. If a mode-specific resume doesn't exist, the link will point to a non-existent file.
 
 ---
 

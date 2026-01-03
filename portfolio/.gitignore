@@ -2,15 +2,24 @@
 node_modules/
 .pnp
 .pnp.js
+.pnp.cjs
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
 
 # Build outputs
 dist/
 .astro/
 .output/
 build/
+.vercel/
+.netlify/
 
 # Environment variables
 .env
+.env.*
+!.env.example
 .env.local
 .env.production.local
 .env.development.local
@@ -24,39 +33,107 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+.pnpm-debug.log*
 
 # OS files
+# macOS
 .DS_Store
 .DS_Store?
 ._*
 .Spotlight-V100
 .Trashes
+.AppleDouble
+.LSOverride
+Icon
+
+# Windows
 ehthumbs.db
 Thumbs.db
-*.swp
-*.swo
-*~
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
 
-# IDE
+# Linux
+*~
+.directory
+.Trash-*
+
+# Editor / IDE
 .vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
 .idea/
 *.sublime-project
 *.sublime-workspace
+*.code-workspace
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+.loadpath
+.externalToolBuilders/
+.buildpath
+
+# Cursor AI (keep .cursor directory)
+!.cursor/
+!.cursor/**
 
 # Testing
 coverage/
 .nyc_output/
+.jest/
+*.test.js.snap
+.cypress/
+
+# TypeScript
+*.tsbuildinfo
+.tsc-cache/
 
 # Temporary files
 *.tmp
 *.temp
 .cache/
+.temp/
+.tmp/
+*.bak
+*.backup
+*.old
 
-# Keep .cursor directory
-!.cursor/
-!.cursor/**
+# Package manager lock files (optional - uncomment if you want to ignore)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
 
+# Astro specific
+.astro/
+.vercel/
+.netlify/
 
+# Vite
+.vite/
 
+# Misc
+*.pem
+*.key
+*.cert
+*.crt
+.parcel-cache/
+.next/
+.nuxt/
+.vuepress/dist/
+.serverless/
+.fusebox/
+.dynamodb/
+.tern-port
+.vscode-test/
 
-
+# Windows reserved names
+nul
+NUL
